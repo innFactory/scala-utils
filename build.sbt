@@ -47,6 +47,7 @@ lazy val utilGraphQL = Project(
     typesafePlay,
     playJson,
     "org.sangria-graphql" %% "sangria" % "2.0.0",
+    "org.sangria-graphql" %% "sangria-marshalling-api" % "1.0.4",
     "org.sangria-graphql" %% "sangria-slowlog" % "2.0.0-M1"
   )
 )

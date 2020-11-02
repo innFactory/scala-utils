@@ -1,6 +1,7 @@
 package de.innfactory.grapqhl.sangria.marshalling
 
 import play.api.libs.json._
+import sangria.marshalling._
 import scala.util.Try
 
 object playJson extends PlayJsonSupportLowPrioImplicits {
