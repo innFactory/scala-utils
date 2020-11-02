@@ -1,5 +1,6 @@
 package de.innfactory.play.db.codegen
 
+import com.github.tminglei.slickpg.ExPostgresProfile
 import slick.codegen.SourceCodeGenerator
 import slick.sql.SqlProfile.ColumnOption
 
@@ -9,7 +10,7 @@ import scala.concurrent.{Await, Future}
 /**
  *  This customizes the Slick code generator.
  */
-abstract class CustomizedCodeGeneratorBase(customizedCodeGeneratorConfig: CustomizedCodeGeneratorConfig, config: Config) {
+abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCodeGeneratorConfig: CustomizedCodeGeneratorConfig, config: Config[T]) {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   /**
@@ -73,7 +74,7 @@ abstract class CustomizedCodeGeneratorBase(customizedCodeGeneratorConfig: Custom
 
   val projectDir: String = System.getProperty("user.dir")
 
-  final def main(): Unit =
+  def main(args: Array[String]): Unit =
   // write the generated results to file
     Await.result(
       codegen.map(
@@ -93,7 +94,7 @@ abstract class CustomizedCodeGeneratorBase(customizedCodeGeneratorConfig: Custom
   val db = slickProfile.api.Database.forURL(config.url, driver = config.jdbcDriver)
 
   lazy val codegen: Future[SourceCodeGenerator] = db.run {
-    config.slickProfile.defaultTables.map(_.filter(t => included contains t.name.name.toUpperCase))
+    config.slickProfile.defaultTables //  .map(_.filter(t => included contains t.name.name.toUpperCase))
       .flatMap(
         config.slickProfile
           .createModelBuilder(_, ignoreInvalidDefaults = false)

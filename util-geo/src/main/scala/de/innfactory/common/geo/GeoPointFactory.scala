@@ -1,4 +1,4 @@
-package de.innfactory.common.geo.GeoPointFactory
+package de.innfactory.common.geo
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 

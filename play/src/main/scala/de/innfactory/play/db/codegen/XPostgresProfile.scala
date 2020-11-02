@@ -23,7 +23,7 @@ trait XPostgresProfile
   override protected def computeCapabilities: Set[Capability] =
     super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
 
-  override val api: API = CodegenAPI
+  override val api = CodegenAPI
 
   object CodegenAPI
     extends API

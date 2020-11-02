@@ -1,6 +1,6 @@
 package de.innfactory.play.db.codegen
 
-abstract class Config {
+abstract class Config[T] {
   lazy val databaseHost: String = sys.env.getOrElse("DATABASE_HOST", "localhost")
   lazy val databasePort: String = sys.env.getOrElse("DATABASE_PORT", "5432")
   lazy val databaseDb: String = sys.env.getOrElse("DATABASE_DB", "test")
@@ -10,5 +10,5 @@ abstract class Config {
     s"jdbc:postgresql://$databaseHost:$databasePort/$databaseDb?user=$databaseUser&password=$databasePassword"
   lazy val url: String = databaseUrl
   lazy val jdbcDriver: String = "org.postgresql.Driver"
-  lazy val slickProfile: XPostgresProfile = XPostgresProfile
+  val slickProfile: T
 }

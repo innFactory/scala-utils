@@ -5,7 +5,7 @@ import sbt.{ Def, _ }
 
 name := """scala-utils"""
 organization := "de.innfactory"
-val releaseVersion = "1.0.69"
+val releaseVersion = "1.0.77"
 
 val defaultProjectSettings = Seq(
   scalaVersion := "2.13.3",
