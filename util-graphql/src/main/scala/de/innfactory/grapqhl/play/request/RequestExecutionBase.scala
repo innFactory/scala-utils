@@ -1,23 +1,47 @@
-package de.innfactory.familotel.cms.graphql.request
+package de.innfactory.grapqhl.play.request
 
-import cats.data.EitherT
-import cats.implicits._
-import de.innfactory.familotel.cms.graphql.exception.ExceptionHandling.{ exceptionHandler, TooComplexQueryError }
-import de.innfactory.familotel.cms.graphql.models.GraphQLExecutionContext
-import de.innfactory.familotel.cms.graphql.request.common.ExecutionServices
-import de.innfactory.familotel.cms.graphql.schema.SchemaDefinition
+import de.innfactory.grapqhl.play.exception.ExceptionHandling
+import de.innfactory.grapqhl.play.exception.ExceptionHandling.TooComplexQueryError
 import play.api.libs.json._
-import play.api.mvc.Results.{ BadRequest, InternalServerError, Ok }
+import play.api.mvc.Results.{BadRequest, InternalServerError, Ok}
 import play.api.mvc._
 import sangria.execution._
-import sangria.parser.{ QueryParser, SyntaxError }
-import sangria.marshalling.playJson._
+import sangria.execution.deferred.DeferredResolver
+import sangria.parser.{QueryParser, SyntaxError}
+import sangria.schema.Schema
 import sangria.slowlog.SlowLog
+import de.innfactory.grapqhl.sangria.marshalling.playJson._
 
-import scala.util.{ Failure, Success }
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{Failure, Success}
+import scala.concurrent.{ExecutionContext, Future}
 
-object RequestExecution {
+abstract class RequestExecutionBase[CTX <: Any, S](schema: Schema[Any, Any], exceptionHandler: ExceptionHandler = ExceptionHandling.exceptionHandler, resolvers: DeferredResolver[Any] = DeferredResolver.empty, deprecationTracker: DeprecationTracker =DeprecationTracker.empty, middleware: List[Middleware[Any]] = Nil, additionalQueryReducers: List[QueryReducer[Any, CTX]] = Nil) {
+
+  // Query Reducers Max Depth Of Request
+  val queryReducerMaxDepth: Int = 15
+  // Query Reducers Max Complexity For Request
+  val queryReducerComplexityThreshold: Int = 4000
+
+  // Predefined Query Reducers
+  val baseQueryReducers: List[QueryReducer[Any, _]] = List(
+    QueryReducer.rejectMaxDepth[Any](queryReducerMaxDepth),
+    QueryReducer.rejectComplexQueries[Any](queryReducerComplexityThreshold, (_, _) ⇒ TooComplexQueryError)
+  )
+
+  def handleSyntaxError(error: SyntaxError): Future[Result] = {
+    Future.successful(
+      BadRequest(
+        Json.obj(
+          "syntaxError" → error.getMessage,
+          "locations"   → Json.arr(
+            Json.obj("line" → error.originalError.position.line, "column" → error.originalError.position.column)
+          )
+        )
+      )
+    )
+  }
+
+  def contextBuilder(services: S, request: Request[AnyContent]): CTX
 
   def executeQuery(
     query: String,
@@ -25,38 +49,23 @@ object RequestExecution {
     operation: Option[String],
     tracing: Boolean,
     request: Request[AnyContent],
-    executionServices: ExecutionServices
+    services: S
   )(implicit ec: ExecutionContext): Future[Result] = {
-
-    val context =
-      GraphQLExecutionContext(
-        request,
-        executionServices.viomaBookingsRepository,
-        executionServices.hotelRepository,
-        executionServices.groupRepository,
-        executionServices.occupancyRatesRepository,
-        executionServices.forecastRateRepository,
-        executionServices.feedRunsRepository,
-        executionServices.usersRepository
-      )
-
+    val context: CTX = contextBuilder(services, request)
     QueryParser.parse(query) match {
-      // query parsed successfully, time to execute it!
       case Success(queryAst)           ⇒
         Executor
           .execute(
-            SchemaDefinition.BookingsSchema,
+            schema,
             queryAst,
             context,
             operationName = operation,
             variables = variables getOrElse Json.obj(),
             exceptionHandler = exceptionHandler,
-            deferredResolver = SchemaDefinition.resolvers,
-            queryReducers = List(
-              QueryReducer.rejectMaxDepth[GraphQLExecutionContext](15),
-              QueryReducer.rejectComplexQueries[GraphQLExecutionContext](4000, (_, _) ⇒ TooComplexQueryError)
-            ),
-            middleware = if (tracing) SlowLog.extension :: Nil else Nil
+            deprecationTracker = deprecationTracker,
+            deferredResolver = resolvers,
+            queryReducers = baseQueryReducers ++ additionalQueryReducers,
+            middleware = if (tracing) SlowLog.extension :: middleware else middleware
           )
           .map(Ok(_))
           .recover {
@@ -64,20 +73,8 @@ object RequestExecution {
             case error: ErrorWithResolver  ⇒ InternalServerError(error.resolveError)
           }
       // can't parse GraphQL query, return error
-      case Failure(error: SyntaxError) ⇒
-        Future.successful(
-          BadRequest(
-            Json.obj(
-              "syntaxError" → error.getMessage,
-              "locations"   → Json.arr(
-                Json.obj("line" → error.originalError.position.line, "column" → error.originalError.position.column)
-              )
-            )
-          )
-        )
-
-      case Failure(error)              ⇒
-        throw error
+      case Failure(error: SyntaxError) ⇒ handleSyntaxError(error)
+      case Failure(error)              ⇒ throw error
     }
   }
 }

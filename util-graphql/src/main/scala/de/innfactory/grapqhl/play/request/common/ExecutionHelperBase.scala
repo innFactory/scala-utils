@@ -5,7 +5,7 @@ import play.api.mvc.Request
 import sangria.renderer.SchemaRenderer
 import sangria.schema.Schema
 
-object ExecutionHelper {
+class ExecutionHelperBase {
   def parseVariables(variables: String) =
     if (variables.trim == "" || variables.trim == "null") Json.obj() else Json.parse(variables).as[JsObject]
 

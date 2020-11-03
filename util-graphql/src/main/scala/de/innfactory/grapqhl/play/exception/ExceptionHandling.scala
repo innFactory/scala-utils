@@ -1,4 +1,4 @@
-package de.innfactory.familotel.cms.graphql.exception
+package de.innfactory.grapqhl.play.exception
 
 import sangria.execution.{ ExceptionHandler, HandledException, MaxQueryDepthReachedError, UserFacingError }
 import sangria.marshalling.ResultMarshaller

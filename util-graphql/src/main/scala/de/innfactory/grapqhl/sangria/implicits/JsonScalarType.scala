@@ -1,14 +1,10 @@
-package de.innfactory.familotel.cms.graphql.models.implicits
+package de.innfactory.grapqhl.sangria.implicits
 
-import play.api.libs.json.{ JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString, JsValue }
+import play.api.libs.json._
 import sangria.ast
-import sangria.execution.Executor
-import sangria.marshalling.{ ArrayMapBuilder, InputUnmarshaller, ResultMarshaller, ScalarValueInfo }
 import sangria.schema._
-import sangria.validation.{ BigIntCoercionViolation, IntCoercionViolation, ValueCoercionViolation }
-import sangria.macros._
-import play.api.libs.json.Json
-import sangria.macros.derive.deriveObjectType
+import sangria.validation.ValueCoercionViolation
+
 object JsonScalarType {
 
   case object JsonCoercionViolation extends ValueCoercionViolation("Not valid JSON")

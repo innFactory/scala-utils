@@ -1,19 +1,28 @@
 import com.typesafe.config.ConfigFactory
-import sbt.{ Def, _ }
-
+import sbt.{Def, _}
 //settings
 
 name := """scala-utils"""
-organization := "de.innfactory"
-val releaseVersion = "1.0.77"
+val releaseVersion = "1.0.85"
+
+val token = sys.env.getOrElse("GITHUB_TOKEN", "")
+
+credentials :=
+  Seq(Credentials(
+    "GitHub Package Registry",
+    "maven.pkg.github.com",
+    "innFactory",
+    token
+  ))
+
 
 val defaultProjectSettings = Seq(
   scalaVersion := "2.13.3",
-  organization := "de.innfactory",
+  organization := "de.innfactory.scala-utils",
   version := releaseVersion,
+  githubOwner := "innFactory",
+  githubRepository := "scala-utils"
 )
-
-
 
 val sharedSettings = defaultProjectSettings
 
@@ -21,7 +30,7 @@ lazy val utilAuth = (project in file("util-auth")
 ).settings(
   sharedSettings
 ).settings(
-  name := "util-auth",
+  name := "auth",
   libraryDependencies ++= Seq(
     "com.google.firebase" % "firebase-admin" % "7.0.1",
     "com.nimbusds" % "nimbus-jose-jwt" % "9.0.1"
@@ -32,17 +41,15 @@ lazy val utilGeo = (project in file("util-geo")
   ).settings(
   sharedSettings
 ).settings(
-  name := "util-geo",
+  name := "geo",
   libraryDependencies ++= Seq(slickPgJts)
 )
 
-lazy val utilGraphQL = Project(
-  id = "util-graphql",
-  base = file("util-graphql")
-).settings(
+lazy val utilGraphQL = (project in file("util-graphql")
+  ).settings(
   sharedSettings
 ).settings(
-  name := "util-graphql",
+  name := "graphql",
   libraryDependencies ++= Seq(
     typesafePlay,
     playJson,
@@ -52,10 +59,8 @@ lazy val utilGraphQL = Project(
   )
 )
 
-lazy val utilImplicits = Project(
-  id = "util-implicits",
-  base = file("util-implicits")
-).settings(
+lazy val utilImplicits = (project in file("util-implicits")
+  ).settings(
   sharedSettings
 ).settings(
   name := "util-implicits",
@@ -79,12 +84,11 @@ val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "6.5.7"
 val typesafePlay = "com.typesafe.play" %% "play" % "2.8.3"
 val playJson = "com.typesafe.play" %% "play-json" % "2.9.1"
 
-lazy val play = Project(
-  id = "play",
-  base = file("play")
-).settings(
+lazy val play = (project in file("play")
+  ).settings(
   sharedSettings
 ).settings(
+  name := "play",
   libraryDependencies ++= Seq(
     playJson,
     typesafePlay,
