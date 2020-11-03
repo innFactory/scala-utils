@@ -15,7 +15,7 @@ import de.innfactory.grapqhl.sangria.marshalling.playJson._
 import scala.util.{Failure, Success}
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class RequestExecutionBase[CTX <: Any, S](schema: Schema[Any, Any], exceptionHandler: ExceptionHandler = ExceptionHandling.exceptionHandler, resolvers: DeferredResolver[Any] = DeferredResolver.empty, deprecationTracker: DeprecationTracker =DeprecationTracker.empty, middleware: List[Middleware[Any]] = Nil, additionalQueryReducers: List[QueryReducer[Any, CTX]] = Nil) {
+abstract class RequestExecutionBase[CTX, S](schema: Schema[CTX, Unit], exceptionHandler: ExceptionHandler = ExceptionHandling.exceptionHandler, resolvers: DeferredResolver[Any] = DeferredResolver.empty, deprecationTracker: DeprecationTracker =DeprecationTracker.empty, middleware: List[Middleware[Any]] = Nil, additionalQueryReducers: List[QueryReducer[Any, CTX]] = Nil) {
 
   // Query Reducers Max Depth Of Request
   val queryReducerMaxDepth: Int = 15
@@ -55,7 +55,7 @@ abstract class RequestExecutionBase[CTX <: Any, S](schema: Schema[Any, Any], exc
     QueryParser.parse(query) match {
       case Success(queryAst)           ⇒
         Executor
-          .execute(
+          .execute[CTX, Unit, JsObject](
             schema,
             queryAst,
             context,

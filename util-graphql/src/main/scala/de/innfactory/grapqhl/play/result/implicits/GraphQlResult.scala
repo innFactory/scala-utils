@@ -25,19 +25,19 @@ object GraphQlResult {
         throw errorParser.internalErrorToUserFacingError(value.left.get)
   }
 
-  case class InternalServerError(msg: String) extends Exception with UserFacingError {
+  case class InternalServerError(msg: String) extends GraphQlException {
     override def getMessage: String = msg
   }
-  case class ForbiddenError(msg: String)      extends Exception with UserFacingError {
+  case class ForbiddenError(msg: String)      extends GraphQlException {
     override def getMessage: String = msg
   }
-  case class BadRequestError(msg: String)     extends Exception with UserFacingError {
+  case class BadRequestError(msg: String)     extends GraphQlException {
     override def getMessage: String = msg
   }
-  case class NotFoundError(msg: String)       extends Exception with UserFacingError {
+  case class NotFoundError(msg: String)       extends GraphQlException {
     override def getMessage: String = msg
   }
-  case class UnauthorizedError(msg: String)   extends Exception with UserFacingError {
+  case class UnauthorizedError(msg: String)   extends GraphQlException {
     override def getMessage: String = msg
   }
 

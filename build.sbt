@@ -3,7 +3,7 @@ import sbt.{Def, _}
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.0.85"
+val releaseVersion = "1.0.89"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -53,6 +53,7 @@ lazy val utilGraphQL = (project in file("util-graphql")
   libraryDependencies ++= Seq(
     typesafePlay,
     playJson,
+    joda,
     "org.sangria-graphql" %% "sangria" % "2.0.0",
     "org.sangria-graphql" %% "sangria-marshalling-api" % "1.0.4",
     "org.sangria-graphql" %% "sangria-slowlog" % "2.0.0-M1"
@@ -80,6 +81,7 @@ val slickPgPlayJson = "com.github.tminglei"  %% "slick-pg_play-json" % "0.19.3"
 val slickPgJts      = "com.github.tminglei"  %% "slick-pg_jts"       % "0.19.3"
 val slickJodaMapper = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2"
 val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "6.5.7"
+val joda            = "joda-time"             % "joda-time"          % "2.10.6"
 
 val typesafePlay = "com.typesafe.play" %% "play" % "2.8.3"
 val playJson = "com.typesafe.play" %% "play-json" % "2.9.1"
