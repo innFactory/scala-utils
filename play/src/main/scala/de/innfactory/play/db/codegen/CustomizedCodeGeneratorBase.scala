@@ -94,7 +94,7 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
   val db = slickProfile.api.Database.forURL(config.url, driver = config.jdbcDriver)
 
   lazy val codegen: Future[SourceCodeGenerator] = db.run {
-    config.slickProfile.defaultTables //  .map(_.filter(t => included contains t.name.name.toUpperCase))
+    config.slickProfile.defaultTables.map(_.filter(t => included contains t.name.name.toUpperCase))
       .flatMap(
         config.slickProfile
           .createModelBuilder(_, ignoreInvalidDefaults = false)

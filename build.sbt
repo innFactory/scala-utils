@@ -3,7 +3,7 @@ import sbt.{Def, _}
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.0.89"
+val releaseVersion = "1.0.90"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
