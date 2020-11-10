@@ -19,7 +19,7 @@ abstract class TestFlywayMigrator(configuration: Configuration, env: Environment
     import org.flywaydb.core.Flyway
 
     val flyway: Flyway = Flyway.configure
-      .dataSource(new DriverDataSource(env.classLoader, driver, url, user, password, new Properties()))
+      .dataSource(new DriverDataSource(env.classLoader, driver, url, user, password))
       .schemas("postgis")
       .baselineOnMigrate(true)
       .locations(s"filesystem:$migrationsFilePath", s"filesystem:$testMigrationsFilePath")

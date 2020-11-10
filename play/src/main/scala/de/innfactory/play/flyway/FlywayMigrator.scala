@@ -18,7 +18,7 @@ class FlywayMigrator (configuration: Configuration, env: Environment, configIden
   import org.flywaydb.core.Flyway
 
   val flyway: Flyway = Flyway.configure
-    .dataSource(new DriverDataSource(env.classLoader, driver, url, user, password, new Properties()))
+    .dataSource(new DriverDataSource(env.classLoader, driver, url, user, password))
     .schemas("postgis")
     .baselineOnMigrate(true)
     .locations(s"filesystem:$migrationsFilePath")

@@ -3,7 +3,7 @@ import sbt.{Def, _}
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.0.90"
+val releaseVersion = "1.0.92"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -33,7 +33,9 @@ lazy val utilAuth = (project in file("util-auth")
   name := "auth",
   libraryDependencies ++= Seq(
     "com.google.firebase" % "firebase-admin" % "7.0.1",
-    "com.nimbusds" % "nimbus-jose-jwt" % "9.0.1"
+    "com.nimbusds" % "nimbus-jose-jwt" % "9.0.1",
+    playJson,
+    typesafePlay
   )
 )
 
@@ -63,12 +65,8 @@ lazy val utilGraphQL = (project in file("util-graphql")
 lazy val utilImplicits = (project in file("util-implicits")
   ).settings(
   sharedSettings
-).settings(
-  name := "util-implicits",
-  libraryDependencies ++= Seq(
-    typesafePlay,
-    playJson,
-  )
+)settings(
+  name := "util-implicits"
 )
 
 
@@ -80,7 +78,7 @@ val slickPg         = "com.github.tminglei"  %% "slick-pg"           % "0.19.3"
 val slickPgPlayJson = "com.github.tminglei"  %% "slick-pg_play-json" % "0.19.3"
 val slickPgJts      = "com.github.tminglei"  %% "slick-pg_jts"       % "0.19.3"
 val slickJodaMapper = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2"
-val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "6.5.7"
+val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "7.1.1"
 val joda            = "joda-time"             % "joda-time"          % "2.10.6"
 
 val typesafePlay = "com.typesafe.play" %% "play" % "2.8.3"
@@ -107,4 +105,4 @@ lazy val play = (project in file("play")
 )
 
 
-lazy val root = project.in(file(".")).settings(sharedSettings).dependsOn(play, utilAuth, utilGeo, utilGraphQL).aggregate(play, utilAuth, utilGeo, utilGraphQL)
+lazy val root = project.in(file(".")).settings(sharedSettings).dependsOn(play, utilAuth, utilGeo, utilGraphQL, utilImplicits).aggregate(play, utilAuth, utilGeo, utilGraphQL, utilImplicits)
