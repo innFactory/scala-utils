@@ -1,192 +1,88 @@
-# Play2-Bootstrap
+# innFactory scala-utils
 
-### Status
-
-[![codecov](https://codecov.io/gh/innFactory/bootstrap-play2/branch/master/graph/badge.svg)](https://codecov.io/gh/innFactory/bootstrap-play2)  ![Run Tests](https://github.com/innFactory/bootstrap-play2/workflows/Run%20Tests/badge.svg) [![Mergify Status][mergify-status]][mergify]
-
-[mergify]: https://mergify.io
-[mergify-status]: https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/innFactory/bootstrap-play2&style=flat
-
-
-###### Scala, Akka, Play2, Slick, Flyway, Insomnia
-
-Bootstrap a rest service with Play2, isolated Slick and isolated Flyway
-
-This project is built with:
-   - Play Framework 2.8.X
-   - Slick 3.3.X
-   - Flyway-sbt & Flyway-Core 6.5.X
-   - Akka 2.6.X
-   - Scala 2.13.X
-   
-  A PostgreSQL Database with activated postgis extensions is needed (for geolocation queries)
-   
-   **Swagger.json is available at /v1/swagger.json**
+Reusable scala utils for awesome innFactory projects.
    
 ## Table of Contents:
 
-- [Play2-Bootstrap](#play2-bootstrap)
-- [Status](#status)
-- [Getting Started](#getting-started)
-    - [Quickstart Dev Guide](#see-quickstart-dev-guidedocquickstartdevguidemd)
-    - [MacOS/Linux/Unix](#macoslinuxunix)
-        - [Prerequisites](#prerequisites)
-        - [Run Locally](#run-locally)
-    - [Windows](#windows)
-- [Documentation](#documentation)
-- [Dependencies](#dependencies)
-    - [Service Accounts](#service-accounts)
-    - [Database](#database)
-- [Miscellaneous](#miscellaneous)
-    - [Testing](#testing)
-    - [Database Migration](#database-migration)
-    - [Code Generation Slick](#slick-code-generation)
-    - [Running](#running)
-- [Licenses](#licenses)
+- [innFactory scala-utils](#innfactory-scala-utils)
+    - [util-auth](#util-auth)
+    - [util-geo](#util-geo)
+    - [util-graphql](#util-graphql)
+    - [util-implicits](#util-implicits)
+    - [util-play](#util-play)
 - [Changes](#changes)
 - [Contributors](#contributors)
 
-## Getting Started
+## util-auth
 
-#### See [Quickstart Dev Guide](./doc/QuickstartDevGuide.md)
+##### Description
 
-#### Insomnia:
+Firebase Auth Utils with Jwt-Validator and Firebase App Initiator
 
-- [Download Insomnia](https://insomnia.rest/download) | [Docs](https://support.insomnia.rest/)
-- Download and import Swagger.json to Insomnia:  
-<a href="https://github.com/innFactory/bootstrap-play2/blob/master/doc-assets/insomnia-workspace.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
+|   Dependencies     |          |   |
+| ------------- |-------------| -----|
+| com.google.firebase      |  firebase-admin | 7.0.1 |
+| com.nimbusds     | nimbus-jose-jwt | 9.0.1 |
+| com.typesafe.play      |play | 2.8.3 |
+| com.typesafe.play      | play-json | 2.9.1 |
 
-- Configure Environment in Insomnia to match with local or prod/staging services
+## util-geo
 
-#### MacOS/Linux/Unix: 
+##### Description
 
-##### Prerequisites: 
+GeoPointFactory to convert Lat-Lon into com.vividsolutions.Geometry for Postgis
 
-- Install Docker
-- Install sbt
-- Install openJDK 11
-- firebase.json (Firebase Service-Account-Access json with firebase-admin-sdk rights) in __./conf/__
 
-##### Run locally:
+|   Dependencies     |          |   |
+| ------------- |:-------------:| -----:|
+| com.github.tminglei      | slick-pg_jts | 0.19.3 |
 
-If prerequisites are met, the service can be started with:
 
-```bash
-cd ./local-runner
+## util-graphql
 
-./runFor.sh
-```
+##### Description
 
-- Name mentioned in logs:
+Sangria Base implementation for Play
 
- ``` 
- ./local-runner/runFor.sh -n Name
- ```
+|   Dependencies     |          |   |
+| ------------- |-------------| -----|
+| org.sangria-graphql      |  sangria | 2.0.0 |
+| org.sangria-graphql      |  sangria-marshalling-api | 1.0.4 |
+| org.sangria-graphql      |  sangria-slowlog | 2.0.0-M |
+| joda-time      |  joda-time | 2.10.6 |
+| com.typesafe.play      |play | 2.8.3 |
+| com.typesafe.play      | play-json | 2.9.1 |
 
-- Remove docker container volume mounted at __./local-runner/postigs__:
+## util-implicits
 
-``` 
-./local-runner/runFor.sh -r
-```
+##### Description
 
-Service is then locally available at: <http://localhost:9000>
+Boolean and Sequence Implicits
 
-[RunForScriptDocs](local-runner/runForDoc.md)
+## util-play
 
-#### Windows:
+##### Description
 
-- Sorry, no out of the box solution
+Play Slick Codegen and Flyway Migrator Base
 
-## Dependencies:
+|   Dependencies     |          |   |
+| ------------- |-------------| -----|
+| org.sangria-graphql      |  sangria | 2.0.0 |
+| org.sangria-graphql      |  sangria-marshalling-api | 1.0.4 |
+| org.sangria-graphql      |  sangria-slowlog | 2.0.0-M |
+| joda-time      |  joda-time | 2.10.6 |
+| com.typesafe.play      |play | 2.8.3 |
+| com.typesafe.play      | play-json | 2.9.1 |
+| com.typesafe.slick      | slick | 3.3.3 |
+| com.typesafe.slick      | slick-codegen | 3.3.3 |
+| com.typesafe.slick      | slick-hikaricp | 3.3.3 |
+| com.zaxxer      | HikariCP | 3.4.5 |
+| com.github.tminglei      | slick-pg | 0.19.3 |
+| com.github.tminglei      | slick-pg_play-json | 0.19.3 |
+| com.github.tototoshi      | slick-joda-mapper | 2.4.2 |
+| org.flywaydb      | flyway-core | 7.1.1 |
+| joda-time      | joda-time |2.10.6 |
 
-#### Service Accounts:
-
-##### ./conf/firebase.json
-
-Service Account from Google Cloud for the Firebase Admin Sdk. Needs **Editor** role.
-
-#### Databases:
-
-- **PostgresQl** Database with Password and User set. Needs Postgis Plugin fully installed.   
-
-## Documentation
-
-<img src="doc/RequestFlow.svg" width="100%" alt="request-flow" />  
-
-###### Request Flow 
-<br/>
-
-- [1. Filter ()](./doc/FilterDoc.md)
-    - [AccessLoggingFilter](./doc/FilterDoc.md#AccessLoggingFilter)
-    - [RouteBlacklistFilter](./doc/FilterDoc.md#RouteBlacklistFilter)
-- [2. Controller (Http Request Handling)](./doc/ControllerDoc.md)
-- [3. Repository (Data handling)](./doc/RepositoryDoc.md)
-- [4. DAOs (Database Access)](./doc/DaoDoc.md)
-    - [BaseDAO](./doc/DaoDoc.md#BaseSlickDAO)
-
-## Deployment and Environment
-
-See here for [Deployment and Environment Documentation](./doc/Deployment.md)
-
-## Authentication
-
-- Some requests will require a Firebase JWT Token in the Authorization Header
-- The Firebase.json file has to be present and filled at ./conf/firebase.json
-
-## Miscellaneous
-
-### Database Migration
-
-This has to be run first
-
-```bash
-sbt flyway/flywayMigrate
-```
-
-### Slick Code Generation
-
-You will need to run the flywayMigrate task first, and then you will be able to generate tables using slickGen.
-
-```bash
-sbt slickGen
-```
-
-after that you will have to mark the folder target/scala-x.xx/scr_managed as "generated sources root"
-
-## Testing
-
-You can run functional tests against an in memory database and Slick easily with Play from a clean slate:
-
-For local Testing:
-
-```bash
-./deployment/runtest.sh
-```
-
-#### For CI:
-
-A Postgis Database has to be available to run:
-
-```bash
-sbt ciTests
-```
-
-## Running
-
-###### Before Running this you have to run: slickGen and ciTest
-
-To run the project, start up Play:
-
-```bash
-sbt run
-```
-
-And that's it!
-
-The service locally aviable at: <http://localhost:9000>
-
-## Licenses:
-Liceses Markdown: [Last updated (18.06.2020)](doc/licenses.md)
 
 ## Changes:
 Changes Markdown: [Changes](doc/changes.md)
