@@ -56,3 +56,5 @@ out/doc
 
 local-runner/postgis-volume
 .bloop/
+
+.gitconfig
