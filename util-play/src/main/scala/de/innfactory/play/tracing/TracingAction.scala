@@ -4,7 +4,6 @@ import io.opencensus.scala.Tracing.{ startSpanWithRemoteParent, traceWithParent 
 import io.opencensus.trace.{ Span, SpanContext, SpanId, TraceId, TraceOptions, Tracestate }
 import play.api.Environment
 import play.api.mvc.{ ActionBuilder, AnyContent, BodyParsers, Request, Result, WrappedRequest }
-
 import javax.inject.Inject
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -16,6 +15,11 @@ protected class TraceActionBuilder(spanString: String, val parser: BodyParsers.D
   val executionContext: ExecutionContext
 ) extends ActionBuilder[RequestWithTrace, AnyContent] {
 
+  val XTRACINGID              = "X-Tracing-ID"
+  val X_INTERNAL_TRACEID      = "X-Internal-TraceId"
+  val X_INTERNAL_SPANID       = "X-Internal-SpanId"
+  val X_INTERNAL_TRACEOPTIONS = "X-Internal-TraceOption"
+
   def finishSpan[A](request: TraceRequest[A], result: Result, parentSpan: Span): Result = {
     request.traceSpan.end()
     parentSpan.end()
@@ -23,10 +27,10 @@ protected class TraceActionBuilder(spanString: String, val parser: BodyParsers.D
   }
 
   override def invokeBlock[A](request: Request[A], block: RequestWithTrace[A] => Future[Result]): Future[Result] = {
-    val headerTracingId = request.headers.get("X-Tracing-ID").get
-    val spanId          = request.headers.get("X-Internal-SpanId").get
-    val traceId         = request.headers.get("X-Internal-TraceId").get
-    val traceOptions    = request.headers.get("X-Internal-TraceOption").get
+    val headerTracingId = request.headers.get(XTRACINGID).get
+    val spanId          = request.headers.get(X_INTERNAL_SPANID).get
+    val traceId         = request.headers.get(X_INTERNAL_TRACEID).get
+    val traceOptions    = request.headers.get(X_INTERNAL_TRACEOPTIONS).get
 
     val span = startSpanWithRemoteParent(
       headerTracingId,

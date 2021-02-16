@@ -3,7 +3,7 @@ import sbt.{ Def, _ }
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.2.1"
+val releaseVersion = "1.3.0"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -98,6 +98,15 @@ val playJson     = "com.typesafe.play" %% "play-json" % "2.9.1"
 val scalaOpencensus = "com.github.sebruck" %% "opencensus-scala-core" % "0.7.2"
 val cats = "org.typelevel" %% "cats-core" % "2.2.0-RC1"
 
+val googleCloudLogger = "com.google.cloud" % "google-cloud-logging-logback" % "0.120.0-alpha"
+val googleCloudLogging = "com.google.cloud" % "google-cloud-logging" % "2.1.3"
+val javaxactiviation = "javax.activation" % "activation" % "1.1.1"
+
+val sl4j = "org.slf4j" % "slf4j-api" % "1.7.30"
+val sharedDeps = "com.google.cloud" % "google-cloud-shared-dependencies" % "0.18.0"
+val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"
+val logbackCore = "ch.qos.logback" % "logback-core" % "1.2.3"
+
 lazy val play = (project in file("util-play"))
   .settings(
     sharedSettings
@@ -105,6 +114,13 @@ lazy val play = (project in file("util-play"))
   .settings(
     name := "play",
     libraryDependencies ++= Seq(
+      googleCloudLogger,
+      googleCloudLogging,
+      javaxactiviation,
+      sl4j,
+      sharedDeps,
+      logback,
+      logbackCore,
       cats,
       scalaOpencensus,
       playJson,
