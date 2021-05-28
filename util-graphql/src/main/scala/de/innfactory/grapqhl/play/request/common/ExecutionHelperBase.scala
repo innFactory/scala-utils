@@ -1,8 +1,8 @@
 package de.innfactory.grapqhl.play.request.common
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{ JsObject, Json }
 import play.api.mvc.Request
-import sangria.renderer.SchemaRenderer
+import sangria.renderer.{ SchemaFilter, SchemaRenderer }
 import sangria.schema.Schema
 
 class ExecutionHelperBase {
@@ -11,5 +11,6 @@ class ExecutionHelperBase {
 
   def isTracingEnabled(request: Request[_]) = request.headers.get("X-Tracing").isDefined
 
-  def renderSchema(schema: Schema[_, _]): String = SchemaRenderer.renderSchema(schema)
+  def renderSchema(schema: Schema[_, _], filter: SchemaFilter = SchemaFilter.withoutGraphQLBuiltIn): String =
+    SchemaRenderer.renderSchema(schema, filter)
 }
