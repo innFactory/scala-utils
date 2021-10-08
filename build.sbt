@@ -3,7 +3,7 @@ import sbt.{ Def, _ }
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.3.0"
+val releaseVersion = "1.4.4"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -28,7 +28,7 @@ val defaultProjectSettings = Seq(
 
 val sharedSettings = defaultProjectSettings
 
-val firebaseAdmin = "com.google.firebase" % "firebase-admin"  % "7.0.1"
+val firebaseAdmin = "com.google.firebase" % "firebase-admin"  % "7.2.0"
 val nimbusJoseJwt = "com.nimbusds"        % "nimbus-jose-jwt" % "9.0.1"
 
 lazy val utilAuth = (project in file("util-auth"))
@@ -86,8 +86,8 @@ val slick           = "com.typesafe.slick"   %% "slick"              % "3.3.3"
 val slickCodegen    = "com.typesafe.slick"   %% "slick-codegen"      % "3.3.3"
 val slickHikaricp   = "com.typesafe.slick"   %% "slick-hikaricp"     % "3.3.3"
 val hikariCP        = "com.zaxxer"            % "HikariCP"           % "3.4.5"
-val slickPg         = "com.github.tminglei"  %% "slick-pg"           % "0.19.3"
-val slickPgPlayJson = "com.github.tminglei"  %% "slick-pg_play-json" % "0.19.3"
+val slickPg         = "com.github.tminglei"  %% "slick-pg"           % "0.19.7"
+val slickPgPlayJson = "com.github.tminglei"  %% "slick-pg_play-json" % "0.19.7"
 val slickJodaMapper = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2"
 val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "7.1.1"
 val joda            = "joda-time"             % "joda-time"          % "2.10.6"
@@ -106,6 +106,7 @@ val sl4j = "org.slf4j" % "slf4j-api" % "1.7.30"
 val sharedDeps = "com.google.cloud" % "google-cloud-shared-dependencies" % "0.18.0"
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"
 val logbackCore = "ch.qos.logback" % "logback-core" % "1.2.3"
+
 
 lazy val play = (project in file("util-play"))
   .settings(

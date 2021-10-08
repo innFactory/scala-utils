@@ -41,7 +41,7 @@ abstract class RequestExecutionBase[CTX, S](schema: Schema[CTX, Unit], exception
     )
   }
 
-  def contextBuilder(services: S, request: Request[AnyContent]): CTX
+  def contextBuilder(services: S, request: Request[AnyContent])(implicit ec: ExecutionContext): CTX
 
   def executeQuery(
     query: String,

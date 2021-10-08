@@ -86,7 +86,7 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
           fileName = customizedCodeGeneratorConfig.fileName
         )
       ),
-      20.seconds
+      customizedCodeGeneratorConfig.timeout
     )
 
   val slickProfile = config.slickProfile
@@ -118,19 +118,19 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
       // ensure to use customized postgres driver at `import profile.simple._`
       override def packageCode(profile: String, pkg: String, container: String, parentType: Option[String]): String =
         s"""
-package ${pkg}
-${codeGenImports}
-// AUTO-GENERATED Slick data model
-/** Stand-alone Slick data model for immediate use */
-object ${container} extends {
-  val profile = ${profile}
-} with ${container}
-/** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
-trait ${container}${parentType.map(t => s" extends $t").getOrElse("")} {
-  val profile: $profile
-  import profile.api._
-  ${indent(code)}
-}
+        package ${pkg}
+        ${codeGenImports}
+        // AUTO-GENERATED Slick data model
+        /** Stand-alone Slick data model for immediate use */
+        object ${container} extends {
+          val profile = ${profile}
+        } with ${container}
+        /** Slick data model trait for extension, choice of backend or usage in the cake pattern. (Make sure to initialize this late.) */
+        trait ${container}${parentType.map(t => s" extends $t").getOrElse("")} {
+          val profile: $profile
+          import profile.api._
+          ${indent(code)}
+        }
       """.trim()
     }
   }

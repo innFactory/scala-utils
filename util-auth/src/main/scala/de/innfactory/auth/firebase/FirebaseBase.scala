@@ -5,15 +5,17 @@ import com.google.firebase.{FirebaseApp, FirebaseOptions}
 
 object FirebaseBase {
 
-    def instantiateFirebase(serviceAccountJsonFilepath: String): FirebaseApp = {
+    def instantiateFirebase(serviceAccountJsonFilepath: String, projectId: String = null): FirebaseApp = {
       val serviceAccount = getClass.getClassLoader.getResourceAsStream(serviceAccountJsonFilepath)
 
       val options: FirebaseOptions = FirebaseOptions.builder()
         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        .setProjectId(projectId)
         .build
 
       FirebaseApp.initializeApp(options)
     }
+
 
     def deleteFirebase(): Unit =
       FirebaseApp.getInstance().delete()
