@@ -7,23 +7,24 @@ val releaseVersion = "1.4.4"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
-credentials :=
-  Seq(
-    Credentials(
+val githubSettings = Seq(
+   githubOwner := "innFactory",
+    githubRepository := "de.innfactory.scala-utils",
+  credentials :=
+    Seq(Credentials(
       "GitHub Package Registry",
       "maven.pkg.github.com",
       "innFactory",
       token
-    )
-  )
+    ))
+)
 
 val defaultProjectSettings = Seq(
   scalaVersion := "2.13.3",
   organization := "de.innfactory.scala-utils",
   version := releaseVersion,
   githubOwner := "innFactory",
-  githubRepository := "scala-utils",
-  githubTokenSource := TokenSource.GitConfig("github.token") || TokenSource.Environment("GITHUB_TOKEN")
+    githubSettings
 )
 
 val sharedSettings = defaultProjectSettings
