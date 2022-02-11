@@ -3,7 +3,7 @@ import sbt.{ Def, _ }
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.4.4"
+val releaseVersion = "1.5.1"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -24,13 +24,13 @@ val defaultProjectSettings = Seq(
   organization := "de.innfactory.scala-utils",
   version := releaseVersion,
   githubOwner := "innFactory",
-    githubSettings
-)
+
+) ++ githubSettings
 
 val sharedSettings = defaultProjectSettings
 
-val firebaseAdmin = "com.google.firebase" % "firebase-admin"  % "7.2.0"
-val nimbusJoseJwt = "com.nimbusds"        % "nimbus-jose-jwt" % "9.0.1"
+val firebaseAdmin = "com.google.firebase" % "firebase-admin"  % "8.1.0"
+val nimbusJoseJwt = "com.nimbusds"        % "nimbus-jose-jwt" % "9.15.2"
 
 lazy val utilAuth = (project in file("util-auth"))
   .settings(
@@ -86,27 +86,27 @@ lazy val utilImplicits = (project in file("util-implicits")).settings(
 val slick           = "com.typesafe.slick"   %% "slick"              % "3.3.3"
 val slickCodegen    = "com.typesafe.slick"   %% "slick-codegen"      % "3.3.3"
 val slickHikaricp   = "com.typesafe.slick"   %% "slick-hikaricp"     % "3.3.3"
-val hikariCP        = "com.zaxxer"            % "HikariCP"           % "3.4.5"
-val slickPg         = "com.github.tminglei"  %% "slick-pg"           % "0.19.7"
-val slickPgPlayJson = "com.github.tminglei"  %% "slick-pg_play-json" % "0.19.7"
+val hikariCP        = "com.zaxxer"            % "HikariCP"           % "5.0.1"
+val slickPg         = "com.github.tminglei"  %% "slick-pg"           % "0.20.2"
+val slickPgPlayJson = "com.github.tminglei"  %% "slick-pg_play-json" % "0.20.2"
 val slickJodaMapper = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2"
-val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "7.1.1"
-val joda            = "joda-time"             % "joda-time"          % "2.10.6"
+val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "8.4.1"
+val joda            = "joda-time"             % "joda-time"          % "2.10.13"
 
-val typesafePlay = "com.typesafe.play" %% "play"      % "2.8.3"
-val playJson     = "com.typesafe.play" %% "play-json" % "2.9.1"
+val typesafePlay = "com.typesafe.play" %% "play"      % "2.8.13"
+val playJson     = "com.typesafe.play" %% "play-json" % "2.9.2"
 
 val scalaOpencensus = "com.github.sebruck" %% "opencensus-scala-core" % "0.7.2"
-val cats = "org.typelevel" %% "cats-core" % "2.2.0-RC1"
+val cats = "org.typelevel" %% "cats-core" % "2.7.0"
 
 val googleCloudLogger = "com.google.cloud" % "google-cloud-logging-logback" % "0.120.0-alpha"
-val googleCloudLogging = "com.google.cloud" % "google-cloud-logging" % "2.1.3"
+val googleCloudLogging = "com.google.cloud" % "google-cloud-logging" % "3.5.1"
 val javaxactiviation = "javax.activation" % "activation" % "1.1.1"
 
-val sl4j = "org.slf4j" % "slf4j-api" % "1.7.30"
-val sharedDeps = "com.google.cloud" % "google-cloud-shared-dependencies" % "0.18.0"
-val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"
-val logbackCore = "ch.qos.logback" % "logback-core" % "1.2.3"
+val sl4j = "org.slf4j" % "slf4j-api" % "1.7.32"
+val sharedDeps = "com.google.cloud" % "google-cloud-shared-dependencies" % "2.5.1"
+val logback = "ch.qos.logback" % "logback-classic" % "1.2.10"
+val logbackCore = "ch.qos.logback" % "logback-core" % "1.2.10"
 
 
 lazy val play = (project in file("util-play"))

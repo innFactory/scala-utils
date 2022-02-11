@@ -14,7 +14,7 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
 
   def mapToResult(value: ResultStatus)(implicit ec: ExecutionContext): play.api.mvc.Result =
     value match {
-      case e: ErrorResult => MvcResults.Status(e.statusCode)(ErrorResponse.fromMessage(e.message))
+      case e: ErrorResult => MvcResults.Status(e.statusCode)(ErrorResponse.fromMessage(e.message, e.additionalInfoErrorCode))
       case _              => MvcResults.Status(400)("")
     }
 
