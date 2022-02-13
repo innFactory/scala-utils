@@ -1,7 +1,6 @@
 package de.innfactory.play.mail
-import de.innfactory.implicits.OptionUtils.EnhancedOption
-import de.innfactory.play.controller.ResultStatus
-import de.innfactory.play.results.Results
+import cats.data.EitherT
+import cats.implicits.catsSyntaxEitherId
 import de.innfactory.play.results.Results.Result
 import play.api.libs.ws.{WSClient, WSRequest}
 
@@ -10,18 +9,27 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MailServiceImpl @Inject()(mailConfig: MailConfig, wsClient: WSClient)(implicit ec: ExecutionContext) extends MailService {
 
-
-  override def sendF(mail: Mail): Future[Option[MailResponse]] = {
-    val request: WSRequest = wsClient.url(mailConfig.endpoint + "/v1/sendmail")
-    request.post(mail.toRequestJson)
-      .map(response => {
-        if (response.status == 200) {
-          response.json.asOpt[MailResponse]
-        } else {
-          None
-        }
-      })
+  override def sendOpt(mail: Mail): Future[Option[MailResponse]] = {
+    send(mail).map {
+      case Right(mailResponse) => Some(mailResponse)
+      case Left(_) => None
+    }
   }
 
-  override def sendE(mail: Mail): Future[Result[MailResponse]] = sendF(mail).map(_.toResult(MailSendError())) // TODO: implement error handling
+  override def send(mail: Mail): Future[Result[MailResponse]] = sendET(mail).value
+
+  override def sendET(mail: Mail): EitherT[Future, MailSendError, MailResponse] = {
+    val request: WSRequest = wsClient.url(mailConfig.endpoint + "/v1/sendmail")
+      .addHttpHeaders(("Authorization", mailConfig.apiKey))
+
+    EitherT(
+       request.post(mail.toRequestJson)
+        .map(response => {
+        if (response.status == 200) {
+          MailResponse(response.body.replace("\"", "")).asRight
+        } else {
+          Left(MailSendError(MailSendError.desc + s" (${response.status})"))
+        }
+      }))
+  }
 }

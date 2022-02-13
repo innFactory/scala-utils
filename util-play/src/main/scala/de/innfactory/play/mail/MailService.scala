@@ -14,10 +14,10 @@ trait MailService {
 
   val logger = Logger("mail").logger
 
-  def sendF(mail: Mail): Future[Option[MailResponse]]
+  def sendOpt(mail: Mail): Future[Option[MailResponse]]
 
-  def sendE(mail: Mail): Future[Result[MailResponse]]
+  def send(mail: Mail): Future[Result[MailResponse]]
 
-  def sendET(mail: Mail): EitherT[Future, Result, MailResponse] = EitherT(sendE(mail))
+  def sendET(mail: Mail): EitherT[Future, MailSendError, MailResponse]
 
 }
