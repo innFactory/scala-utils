@@ -153,7 +153,7 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
     def completeResult(statusCode: Int = 200)(implicit writes: Writes[T]): Future[play.api.mvc.Result] =
       value.value.map {
         case Left(error: ResultStatus) => mapToResult(error)
-        case Right(value)           => MvcResults.Status(statusCode)(Json.toJson(value))
+        case Right(value: T)           => MvcResults.Status(statusCode)(Json.toJson(value))
       }
 
     def completeResultWithoutBody(statusCode: Int = 200): Future[play.api.mvc.Result] =
