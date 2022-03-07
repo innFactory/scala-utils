@@ -3,13 +3,15 @@ import sbt.{ Def, _ }
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.5.1"
+val releaseVersion = "1.5.2"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
 val githubSettings = Seq(
    githubOwner := "innFactory",
     githubRepository := "de.innfactory.scala-utils",
+  githubRepository := "scala-utils",
+  githubTokenSource := TokenSource.GitConfig("github.token") || TokenSource.Environment("GITHUB_TOKEN"),
   credentials :=
     Seq(Credentials(
       "GitHub Package Registry",

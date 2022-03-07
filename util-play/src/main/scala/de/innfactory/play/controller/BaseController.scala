@@ -7,14 +7,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{JsError, Json, Reads, Writes}
 import play.api.mvc.{AbstractController, Action, ActionBuilder, AnyContent, BodyParser, ControllerComponents, Request, Result, Results => MvcResults}
 import cats.instances.future._
-
+import scala.reflect.runtime.universe.TypeTag
 import scala.language.implicitConversions
 
 abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionContext) extends AbstractController(cc) {
 
   def mapToResult(value: ResultStatus)(implicit ec: ExecutionContext): play.api.mvc.Result =
     value match {
-      case e: ErrorResult => MvcResults.Status(e.statusCode)(ErrorResponse.fromMessage(e.message, e.additionalInfoErrorCode))
+      case e: ErrorResult =>
+        MvcResults.Status(e.statusCode)(ErrorResponse.fromMessage(e.message, e.additionalInfoErrorCode))
       case _              => MvcResults.Status(400)("")
     }
 
@@ -76,9 +77,9 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
 
   class Endpoint[
     In,
-    Out,
+    Out: TypeTag,
     RequestT[_] <: Request[_],
-    Domain,
+    Domain: TypeTag,
     DomainAttribute
   ](
     actionBuilder: ActionBuilder[RequestT, In],
@@ -86,27 +87,43 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
     outMapper: OutMapperO[Domain, Out] = OutMapperEmpty[Domain, Out](),
     useCaseL: (DomainAttribute, RequestT[In]) => UseCaseL[Domain] = (a: DomainAttribute, b: RequestT[In]) =>
       UseCaseLogicEmpty[Domain]()
-  ) {
+  )(implicit tt: TypeTag[Out], ttD: TypeTag[Domain]) {
 
-    def mapOutTo[OutT](implicit
-      outMapperImplicit: OutMapperO[Domain, OutT]
-    ): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
+    def mapOutTo[OutT](
+      outMapperImplicit: OutMapperO[Domain, OutT])(implicit ttO: TypeTag[OutT]
+   ): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
       new Endpoint[In, OutT, RequestT, Domain, DomainAttribute](
-        actionBuilder,
+       actionBuilder,
         converter,
         outMapperImplicit,
         useCaseL
-      )
+      )(ttO, ttD, ttO, ttD)
+
+    def mapOutTo: Endpoint[In, Domain, RequestT, Domain, DomainAttribute] =
+      new Endpoint[In, Domain, RequestT, Domain, DomainAttribute](
+        actionBuilder,
+        converter,
+        new OutMapperEmpty[Domain, Domain],
+        useCaseL
+      )(ttD, ttD, ttD, ttD)
+
+    def mapOutTo[OutT](implicit map: Domain => OutT, ttO: TypeTag[OutT]): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
+      new Endpoint[In, OutT, RequestT, Domain, DomainAttribute](
+        actionBuilder,
+        converter,
+        new OutMapper[Domain, OutT](map),
+        useCaseL
+      )(ttO, ttD, ttO, ttD)
 
     def logic[DomainT](
       useCaseLogic: (DomainAttribute, RequestT[In]) => UseCaseL[DomainT]
-    ): Endpoint[In, Out, RequestT, DomainT, DomainAttribute] =
+    )(implicit ttDT: TypeTag[DomainT]): Endpoint[In, Out, RequestT, DomainT, DomainAttribute] =
       new Endpoint[In, Out, RequestT, DomainT, DomainAttribute](
         actionBuilder,
         converter,
         OutMapperEmpty[DomainT, Out](),
         useCaseLogic
-      )
+      )(tt, ttDT, tt, ttDT)
 
     def result(completer: EitherT[Future, ResultStatus, Out] => Future[Result]): Action[In] =
       actionBuilder.async { implicit request =>
@@ -120,16 +137,14 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
             case UseCaseLogic(logic) =>
               for {
                 res <- logic
-              } yield outMap(res)
-            case _ => throw new IllegalArgumentException("Usecase must include out mapping")
+              } yield outMapper match {
+                case OutMapper(outMapper)                                => outMapper(res)
+                case OutMapperEmpty() if tt.getClass == ttD.getClass => res.asInstanceOf[Out]
+                case OutMapperEmpty()                                    => throw new IllegalArgumentException("Cannot derive Out Mapping")
+              }
+            case _                   => throw new IllegalArgumentException("Usecase must include out mapping")
           }
-        case _ => throw new IllegalArgumentException("UseCase cannot be Empty")
-      }
-
-    private def outMap: Domain => Out =
-      outMapper match {
-        case OutMapper(outMapper) => outMapper
-        case _ => throw new IllegalArgumentException("Out Mapper cannot be Empty")
+        case _                            => throw new IllegalArgumentException("UseCase cannot be Empty")
       }
 
   }
@@ -144,7 +159,7 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
     def completeResultWithoutBody(statusCode: Int = 200): Future[play.api.mvc.Result] =
       value.value.map {
         case Left(error: ResultStatus) => mapToResult(error)
-        case Right(_)               => MvcResults.Status(statusCode)("")
+        case Right(_)                  => MvcResults.Status(statusCode)("")
       }
   }
 
