@@ -32,6 +32,7 @@ abstract class OptionalBooleanFilterOptions[E, V] extends FilterOptions[E, V] {
       params.get(equalsQueryParam) match {
         case Some(value) if value.nonEmpty => equalsOption = EqualsOptionBoolean(Some(value.headOption.get.toBoolean))
         case None                          => equalsOption = EqualsOptionBoolean(None)
+        case _                              => equalsOption = EqualsOptionBoolean(None)
       }
       if (equalsOption.value.isDefined)
         Some(

@@ -20,7 +20,7 @@ val githubSettings = Seq(
 )
 
 val defaultProjectSettings = Seq(
-  scalaVersion := "2.13.3",
+  scalaVersion := "2.13.8",
   organization := "de.innfactory.scala-utils",
   version := releaseVersion,
   githubOwner := "innFactory",
@@ -93,7 +93,9 @@ val slickJodaMapper = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2"
 val flyWayCore      = "org.flywaydb"          % "flyway-core"        % "8.4.1"
 val joda            = "joda-time"             % "joda-time"          % "2.10.13"
 
-val typesafePlay = "com.typesafe.play" %% "play"      % "2.8.13"
+val playVersion = "2.8.13"
+val typesafePlay = "com.typesafe.play" %% "play"      % playVersion
+val playWs     = "com.typesafe.play" %% "play-ws" % playVersion
 val playJson     = "com.typesafe.play" %% "play-json" % "2.9.2"
 
 val scalaOpencensus = "com.github.sebruck" %% "opencensus-scala-core" % "0.7.2"
@@ -108,6 +110,7 @@ val sharedDeps = "com.google.cloud" % "google-cloud-shared-dependencies" % "2.5.
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.10"
 val logbackCore = "ch.qos.logback" % "logback-core" % "1.2.10"
 
+val guice = "com.google.inject" % "guice" % "4.2.3"
 
 lazy val play = (project in file("util-play"))
   .settings(
@@ -135,9 +138,13 @@ lazy val play = (project in file("util-play"))
       slickCodegen,
       slickHikaricp,
       hikariCP,
-      flyWayCore
+      flyWayCore,
+      guice,
+      playWs
     )
   )
+  .dependsOn(utilImplicits)
+  .aggregate(utilImplicits)
 
 lazy val root = project
   .in(file("."))
