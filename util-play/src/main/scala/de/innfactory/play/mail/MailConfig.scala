@@ -2,8 +2,14 @@ package de.innfactory.play.mail
 
 import com.typesafe.config.Config
 
-case class MailConfig(endpoint: String, apiKey: String)
+import javax.inject.Inject
 
-object MailConfig {
-  def default()(implicit config : Config) = MailConfig(config.getString("mail.endpoint"), config.getString("mail.apiKey"))
+trait MailConfig {
+  def endpoint: String
+  def apiKey: String
+}
+
+class DefaultMailConfig @Inject()(config: Config) extends MailConfig {
+  def endpoint: String = config.getString("mail.endpoint")
+  def apiKey: String = config.getString("mail.apiKey")
 }

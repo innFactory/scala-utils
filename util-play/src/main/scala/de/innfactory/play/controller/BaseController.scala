@@ -3,9 +3,19 @@ package de.innfactory.play.controller
 import akka.stream.scaladsl.Source
 import cats.data.EitherT
 
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.{JsError, Json, Reads, Writes}
-import play.api.mvc.{AbstractController, Action, ActionBuilder, AnyContent, BodyParser, ControllerComponents, Request, Result, Results => MvcResults}
+import scala.concurrent.{ ExecutionContext, Future }
+import play.api.libs.json.{ JsError, Json, Reads, Writes }
+import play.api.mvc.{
+  AbstractController,
+  Action,
+  ActionBuilder,
+  AnyContent,
+  BodyParser,
+  ControllerComponents,
+  Request,
+  Result,
+  Results => MvcResults
+}
 import cats.instances.future._
 import scala.reflect.runtime.universe.TypeTag
 import scala.language.implicitConversions
@@ -90,10 +100,10 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
   )(implicit tt: TypeTag[Out], ttD: TypeTag[Domain]) {
 
     def mapOutTo[OutT](
-      outMapperImplicit: OutMapperO[Domain, OutT])(implicit ttO: TypeTag[OutT]
-   ): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
+      outMapperImplicit: OutMapperO[Domain, OutT]
+    )(implicit ttO: TypeTag[OutT]): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
       new Endpoint[In, OutT, RequestT, Domain, DomainAttribute](
-       actionBuilder,
+        actionBuilder,
         converter,
         outMapperImplicit,
         useCaseL
@@ -107,7 +117,10 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
         useCaseL
       )(ttD, ttD, ttD, ttD)
 
-    def mapOutTo[OutT](implicit map: Domain => OutT, ttO: TypeTag[OutT]): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
+    def mapOutTo[OutT](implicit
+      map: Domain => OutT,
+      ttO: TypeTag[OutT]
+    ): Endpoint[In, OutT, RequestT, Domain, DomainAttribute] =
       new Endpoint[In, OutT, RequestT, Domain, DomainAttribute](
         actionBuilder,
         converter,
@@ -138,9 +151,9 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
               for {
                 res <- logic
               } yield outMapper match {
-                case OutMapper(outMapper)                                => outMapper(res)
+                case OutMapper(outMapper)                            => outMapper(res)
                 case OutMapperEmpty() if tt.getClass == ttD.getClass => res.asInstanceOf[Out]
-                case OutMapperEmpty()                                    => throw new IllegalArgumentException("Cannot derive Out Mapping")
+                case OutMapperEmpty()                                => throw new IllegalArgumentException("Cannot derive Out Mapping")
               }
             case _                   => throw new IllegalArgumentException("Usecase must include out mapping")
           }
@@ -149,25 +162,34 @@ abstract class BaseController(implicit cc: ControllerComponents, ec: ExecutionCo
 
   }
 
+  var NOCACHEHEADER = ("cache-control", "no-cache, no-store, must-revalidate")
+
   implicit class RichResult[T](value: EitherT[Future, ResultStatus, T])(implicit ec: ExecutionContext) {
-    def completeResult(statusCode: Int = 200)(implicit writes: Writes[T]): Future[play.api.mvc.Result] =
+    def completeResult(statusCode: Int = 200, headers: Seq[(String, String)] = Seq(NOCACHEHEADER))(implicit
+      writes: Writes[T]
+    ): Future[play.api.mvc.Result] =
       value.value.map {
         case Left(error: ResultStatus) => mapToResult(error)
-        case Right(value: T)           => MvcResults.Status(statusCode)(Json.toJson(value))
+        case Right(value: T)           => MvcResults.Status(statusCode)(Json.toJson(value)).withHeaders(headers: _*)
       }
 
-    def completeResultWithoutBody(statusCode: Int = 200): Future[play.api.mvc.Result] =
+    def completeResultWithoutBody(
+      statusCode: Int = 200,
+      headers: Seq[(String, String)] = Seq(NOCACHEHEADER)
+    ): Future[play.api.mvc.Result] =
       value.value.map {
         case Left(error: ResultStatus) => mapToResult(error)
-        case Right(_)                  => MvcResults.Status(statusCode)("")
+        case Right(_)                  => MvcResults.Status(statusCode)("").withHeaders(headers: _*)
       }
   }
 
   implicit class RichSeqResult[T](value: EitherT[Future, ResultStatus, Seq[T]])(implicit ec: ExecutionContext) {
-    def completeResult()(implicit writes: Writes[T]): Future[play.api.mvc.Result] =
+    def completeResult(
+      headers: Seq[(String, String)] = Seq(NOCACHEHEADER)
+    )(implicit writes: Writes[T]): Future[play.api.mvc.Result] =
       value.value.map {
         case Left(error: ResultStatus) => mapToResult(error)
-        case Right(value: Seq[T])      => MvcResults.Status(200)(Json.toJson(value))
+        case Right(value: Seq[T])      => MvcResults.Status(200)(Json.toJson(value)).withHeaders(headers: _*)
       }
   }
 

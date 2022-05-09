@@ -9,15 +9,14 @@ import de.innfactory.play.controller.ResultStatus
 import de.innfactory.play.results.Results.Result
 import play.api.Logger
 
-@ImplementedBy(classOf[MailServiceImpl])
 trait MailService {
 
   val logger = Logger("mail").logger
 
-  def sendOpt(mail: Mail): Future[Option[MailResponse]]
+  def sendAsOption(mail: Mail): Future[Option[MailResponse]]
 
   def send(mail: Mail): Future[Result[MailResponse]]
 
-  def sendET(mail: Mail): EitherT[Future, MailSendError, MailResponse]
+  def sendAsEitherT(mail: Mail): EitherT[Future, MailSendError, MailResponse]
 
 }
