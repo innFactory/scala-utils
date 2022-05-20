@@ -316,6 +316,10 @@ public class LoggingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 builder.addLabel("className", logbackContext.className().get());
             }
 
+            if(logbackContext.entity().isDefined()) {
+                builder.addLabel("entity", logbackContext.entity().get());
+            }
+
         } catch(Exception ex) {
             // Nothing
         }
