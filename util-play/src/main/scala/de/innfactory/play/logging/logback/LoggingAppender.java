@@ -293,6 +293,17 @@ public class LoggingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
         Map<String, Object> jsonContent = new HashMap<>();
         jsonContent.put("message", payload.toString().trim());
+
+        try {
+            LogbackContext logbackContext = LogbackContext.parse(marker.toString());
+            if (logbackContext.entity().isDefined()) {
+                jsonContent.put("entity", logbackContext.entity().get());
+            }
+        } catch(Exception ex) {
+            jsonContent.put("logbackContextError", ex.getMessage());
+            jsonContent.put("logbackContextErrorMarker", marker.toString());
+        }
+
         if (severity == Severity.ERROR) {
             jsonContent.put("@type", TYPE);
         }
@@ -306,7 +317,7 @@ public class LoggingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 .addLabel(LOGGER_NAME_KEY, e.getLoggerName());
 
         try {
-            LogbackContext logbackContext = Json.parse(marker.toString()).as(LogbackContext.reads());
+            LogbackContext logbackContext = LogbackContext.parse(marker.toString());
 
             if(logbackContext.trace().isDefined()) {
                 builder.setTrace("projects/" + getProjectId() + "/traces/" + logbackContext.trace().get());
@@ -316,12 +327,9 @@ public class LoggingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
                 builder.addLabel("className", logbackContext.className().get());
             }
 
-            if(logbackContext.entity().isDefined()) {
-                builder.addLabel("entity", logbackContext.entity().get());
-            }
-
         } catch(Exception ex) {
-            // Nothing
+           builder.addLabel("logbackContextError", ex.getMessage());
+           builder.addLabel("logbackContextErrorMarker", marker.toString());
         }
 
 

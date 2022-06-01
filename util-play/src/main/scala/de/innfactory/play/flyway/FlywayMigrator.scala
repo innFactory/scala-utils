@@ -10,10 +10,10 @@ class FlywayMigrator (configuration: Configuration, env: Environment, configIden
 
   logger.info("Creating Flyway context")
 
-  private val driver   = configuration.get[String](s"$configIdentifier.database.driver")
-  private val url      = configuration.get[String](s"$configIdentifier.database.url")
-  private val user     = configuration.get[String](s"$configIdentifier.database.user")
-  private val password = configuration.get[String](s"$configIdentifier.database.password")
+  private val driver   = configuration.get[String](s"$configIdentifier.driver")
+  private val url      = configuration.get[String](s"$configIdentifier.url")
+  private val user     = configuration.get[String](s"$configIdentifier.user")
+  private val password = configuration.get[String](s"$configIdentifier.password")
 
   import org.flywaydb.core.Flyway
 
