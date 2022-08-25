@@ -3,13 +3,13 @@ import sbt.{ Def, _ }
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "1.5.7"
+val releaseVersion = "1.5.8"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
 val githubSettings = Seq(
-   githubOwner := "innFactory",
-    githubRepository := "de.innfactory.scala-utils",
+  githubOwner := "innFactory",
+  githubRepository := "de.innfactory.scala-utils",
   githubRepository := "scala-utils",
   githubTokenSource := TokenSource.GitConfig("github.token") || TokenSource.Environment("GITHUB_TOKEN"),
   credentials :=
@@ -112,6 +112,8 @@ val sharedDeps = "com.google.cloud" % "google-cloud-shared-dependencies" % "2.5.
 val logback = "ch.qos.logback" % "logback-classic" % "1.2.10"
 val logbackCore = "ch.qos.logback" % "logback-core" % "1.2.10"
 
+val endpointBuilder = "de.innfactory" %% "smithy4play" % "0.2.2-HOTFIX-4"
+
 val guice = "com.google.inject" % "guice" % "4.2.3"
 
 lazy val play = (project in file("util-play"))
@@ -142,7 +144,8 @@ lazy val play = (project in file("util-play"))
       hikariCP,
       flyWayCore,
       guice,
-      playWs
+      playWs,
+      endpointBuilder
     )
   )
   .dependsOn(utilImplicits)
