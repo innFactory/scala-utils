@@ -1,7 +1,8 @@
-package de.innfactory.play.smithy4play
+package de.innfactory.play.tracing
 
+import de.innfactory.play.smithy4play.LogContext
 import io.opencensus.trace.Span
-import org.slf4j.{Marker, MarkerFactory}
+import org.slf4j.{ Marker, MarkerFactory }
 import play.api.Logger
 import play.api.libs.json.Json
 

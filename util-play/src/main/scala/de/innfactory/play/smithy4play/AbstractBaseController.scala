@@ -1,7 +1,7 @@
 package de.innfactory.play.smithy4play
 
 import cats.data.{ EitherT, Kleisli }
-import de.innfactory.play.smithy4play.TracingHelper.generateSpanFromRemoteSpan
+import de.innfactory.play.tracing.TracingHelper.generateSpanFromRemoteSpan
 import de.innfactory.smithy4play.{ ContextRouteError, RouteResult, RoutingContext }
 import io.opencensus.scala.Tracing.{ startSpan, traceWithParent }
 import io.opencensus.trace.Span

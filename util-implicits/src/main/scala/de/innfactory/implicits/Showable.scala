@@ -1,13 +1,22 @@
 package de.innfactory.implicits
 
 trait Showable { this: Product =>
+  override def toString: String = this.show
+}
 
-  def show: String = {
-    val className = this.productPrefix
-    val fieldNames = this.productElementNames.toList
-    val fieldValues = this.productIterator.toList
-    val fields = fieldNames.zip(fieldValues).map { case (name, value) => s"$name = $value" }
-    fields.mkString(s"$className(", ", ", ")")
+object Showable {
+  implicit class ShowableProduct(product: Product) {
+    def show: String = {
+      val className   = product.productPrefix
+      val fieldNames  = product.productElementNames.toList
+      val fieldValues = product.productIterator.toList
+      val fields      = fieldNames.zip(fieldValues).map { case (name, value) =>
+        value match {
+          case subProduct: Product => s"$name = ${subProduct.show}"
+          case _                   => s"$name = $value"
+        }
+      }
+      fields.mkString(s"$className(", ", ", ")")
+    }
   }
-  override def toString: String = show
 }

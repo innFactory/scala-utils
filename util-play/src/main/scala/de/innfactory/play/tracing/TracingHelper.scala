@@ -1,5 +1,6 @@
-package de.innfactory.play.smithy4play
+package de.innfactory.play.tracing
 
+import de.innfactory.play.smithy4play.HttpHeaders
 import de.innfactory.play.tracing.GoogleTracingIdentifier.{
   XTRACINGID,
   X_INTERNAL_SPANID,
@@ -7,7 +8,7 @@ import de.innfactory.play.tracing.GoogleTracingIdentifier.{
   X_INTERNAL_TRACEOPTIONS
 }
 import io.opencensus.scala.Tracing.startSpanWithRemoteParent
-import io.opencensus.trace.{ Span, SpanContext, SpanId, TraceId, TraceOptions, Tracestate }
+import io.opencensus.trace._
 
 object TracingHelper {
 
