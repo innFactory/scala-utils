@@ -72,7 +72,11 @@ val typesafePlay = "com.typesafe.play" %% "play"      % playVersion
 val playWs       = "com.typesafe.play" %% "play-ws"   % playVersion
 val playJson     = "com.typesafe.play" %% "play-json" % "2.9.2"
 
-val scalaOpencensus = "com.github.sebruck" %% "opencensus-scala-core" % "0.7.2"
+val opentelemetryApi           = "io.opentelemetry"               % "opentelemetry-api" % "1.18.0"
+val opentelemetryBom           = "io.opentelemetry"               % "opentelemetry-bom" % "1.18.0"
+val opentelemetrySdk           = "io.opentelemetry"               % "opentelemetry-sdk" % "1.18.0"
+val opentelemetryGCloudTraces  = "com.google.cloud.opentelemetry" % "exporter-trace"    % "0.23.0"
+val opentelemetryGCloudMetrics = "com.google.cloud.opentelemetry" % "exporter-metrics"  % "0.23.0"
 
 val cats = "org.typelevel" %% "cats-core" % "2.7.0"
 
@@ -104,7 +108,6 @@ lazy val play = (project in file("util-play"))
       logback,
       logbackCore,
       cats,
-      scalaOpencensus,
       playJson,
       typesafePlay,
       slickPg,
@@ -118,7 +121,12 @@ lazy val play = (project in file("util-play"))
       guice,
       playWs,
       endpointBuilder,
-      slickPgJts
+      slickPgJts,
+      opentelemetryApi,
+      opentelemetryBom,
+      opentelemetrySdk,
+      opentelemetryGCloudTraces,
+      opentelemetryGCloudMetrics
     )
   )
   .dependsOn(utilImplicits)

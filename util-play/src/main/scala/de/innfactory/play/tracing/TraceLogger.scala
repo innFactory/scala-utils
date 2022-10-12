@@ -1,7 +1,7 @@
 package de.innfactory.play.tracing
 
 import de.innfactory.play.smithy4play.LogContext
-import io.opencensus.trace.Span
+import io.opentelemetry.api.trace.Span
 import org.slf4j.{ Marker, MarkerFactory }
 import play.api.Logger
 import play.api.libs.json.Json
@@ -13,7 +13,7 @@ class TraceLogger(span: Option[Span]) {
     MarkerFactory.getMarker(spanToMarker(span, entity))
 
   private def spanToMarker(span: Span, entity: Option[String])(implicit logContext: LogContext): String =
-    Json.prettyPrint(Json.toJson(logContext.toLogbackContext(span.getContext.getTraceId.toLowerBase16, entity)))
+    Json.prettyPrint(Json.toJson(logContext.toLogbackContext(span.getSpanContext.getTraceId, entity)))
 
   def warn(message: String, entity: Option[String] = None)(implicit logContext: LogContext): Unit =
     span match {
