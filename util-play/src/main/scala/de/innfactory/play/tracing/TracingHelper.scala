@@ -2,6 +2,7 @@ package de.innfactory.play.tracing
 
 import com.google.cloud.opentelemetry.metric.{ GoogleCloudMetricExporter, MetricConfiguration }
 import com.google.cloud.opentelemetry.trace.{ TraceConfiguration, TraceExporter }
+import com.typesafe.config.Config
 import de.innfactory.play.smithy4play.HttpHeaders
 import de.innfactory.play.tracing.GoogleTracingIdentifier.{
   XTRACINGID,
@@ -10,7 +11,6 @@ import de.innfactory.play.tracing.GoogleTracingIdentifier.{
   X_INTERNAL_TRACEOPTIONS
 }
 import io.opentelemetry.api.OpenTelemetry
-import io.opentelemetry.api.common.Attributes
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator
 import io.opentelemetry.api.trace.{ Span, SpanContext, SpanId, TraceFlags, TraceId, TraceState, Tracer }
 import io.opentelemetry.context.Context
@@ -18,28 +18,32 @@ import io.opentelemetry.context.propagation.ContextPropagators
 import io.opentelemetry.sdk.OpenTelemetrySdk
 import io.opentelemetry.sdk.metrics.SdkMeterProvider
 import io.opentelemetry.sdk.metrics.`export`.PeriodicMetricReader
-import io.opentelemetry.sdk.resources.Resource
 import io.opentelemetry.sdk.trace.SdkTracerProvider
 import io.opentelemetry.sdk.trace.`export`.BatchSpanProcessor
-import io.opentelemetry.semconv.resource.attributes.ResourceAttributes
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 object TracingHelper {
 
   def traceWithParent[T](traceString: String, parent: Span)(implicit
-    tracer: Tracer,
+    logContext: LogContext,
+    config: Config,
     ec: ExecutionContext
   ): (Span => Future[T]) => Future[T] =
     (process: Span => Future[T]) => {
-      val childSpan = tracer.spanBuilder(traceString).setParent(Context.current.`with`(parent)).startSpan
+      val childSpan = logContext.getTracer
+        .spanBuilder(traceString)
+        .setParent(Context.current.`with`(parent))
+        .startSpan
       for {
         result <- process(childSpan)
         _       = childSpan.end()
       } yield result
     }
 
-  def generateSpanFromRemoteSpan[A](headers: HttpHeaders)(implicit tracer: Tracer): Option[Span] = {
+  def generateSpanFromRemoteSpan[A](
+    headers: HttpHeaders
+  )(implicit logContext: LogContext, config: Config): Option[Span] = {
     val headerTracingIdOptional = headers.getHeader(XTRACINGID)
     val spanIdOptional          = headers.getHeader(X_INTERNAL_SPANID)
     val traceIdOptional         = headers.getHeader(X_INTERNAL_TRACEID)
@@ -50,7 +54,7 @@ object TracingHelper {
       spanId          <- spanIdOptional
       traceId         <- traceIdOptional
       traceOptions    <- traceOptionsOptional
-    } yield tracer
+    } yield logContext.getTracer
       .spanBuilder(headerTracingId)
       .setParent(
         Context
@@ -71,7 +75,6 @@ object TracingHelper {
 
   def createTracer(
     projectId: String,
-    serviceName: String,
     instrumentationScopeName: String,
     instrumentationScopeVersion: String
   ): Tracer = {
@@ -80,19 +83,14 @@ object TracingHelper {
     val metricExporter: GoogleCloudMetricExporter =
       GoogleCloudMetricExporter.createWithConfiguration(
         MetricConfiguration.builder().setProjectId(projectId).build()
-      );
-
-    val resource: Resource =
-      Resource.getDefault.merge(Resource.create(Attributes.of(ResourceAttributes.SERVICE_NAME, serviceName)))
+      )
 
     val sdkTracerProvider: SdkTracerProvider = SdkTracerProvider.builder
       .addSpanProcessor(BatchSpanProcessor.builder(traceExporter).build)
-      .setResource(resource)
       .build
 
     val sdkMeterProvider: SdkMeterProvider = SdkMeterProvider.builder
       .registerMetricReader(PeriodicMetricReader.builder(metricExporter).build)
-      .setResource(resource)
       .build
 
     val openTelemetry: OpenTelemetry = OpenTelemetrySdk.builder

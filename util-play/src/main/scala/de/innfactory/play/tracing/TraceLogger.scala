@@ -1,6 +1,5 @@
 package de.innfactory.play.tracing
 
-import de.innfactory.play.smithy4play.LogContext
 import io.opentelemetry.api.trace.Span
 import org.slf4j.{ Marker, MarkerFactory }
 import play.api.Logger
