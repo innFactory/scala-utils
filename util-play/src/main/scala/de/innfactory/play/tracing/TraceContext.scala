@@ -1,6 +1,6 @@
 package de.innfactory.play.tracing
 
-import de.innfactory.play.smithy4play.{ ContextWithHeaders, HttpHeaders }
+import de.innfactory.play.smithy4play.{ ContextWithHeaders, HttpHeaders, ImplicitLogContext }
 import io.opentelemetry.api.trace.Span
 
 trait TraceContext extends ImplicitLogContext with ContextWithHeaders {
