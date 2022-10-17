@@ -2,7 +2,7 @@ import sbt._
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "2.0.0"
+val releaseVersion = "2.0.1"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -90,7 +90,7 @@ val sharedDeps  = "com.google.cloud" % "google-cloud-shared-dependencies" % "2.5
 val logback     = "ch.qos.logback"   % "logback-classic"                  % "1.2.10"
 val logbackCore = "ch.qos.logback"   % "logback-core"                     % "1.2.10"
 
-val endpointBuilder = "de.innfactory" %% "smithy4play" % "0.2.2-HOTFIX-4"
+val smithy4play = "de.innfactory" %% "smithy4play" % "0.2.3-HOTFIX"
 
 val guice = "com.google.inject" % "guice" % "4.2.3"
 
@@ -121,7 +121,7 @@ lazy val play = (project in file("util-play"))
       flyWayCore,
       guice,
       playWs,
-      endpointBuilder,
+      smithy4play,
       slickPgJts,
       opentelemetryApi,
       opentelemetryBom,
