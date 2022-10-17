@@ -72,12 +72,12 @@ val typesafePlay = "com.typesafe.play" %% "play"      % playVersion
 val playWs       = "com.typesafe.play" %% "play-ws"   % playVersion
 val playJson     = "com.typesafe.play" %% "play-json" % "2.9.2"
 
-val opentelemetryApi              = "io.opentelemetry"               % "opentelemetry-api"                % "1.18.0"
-val opentelemetryBom              = "io.opentelemetry"               % "opentelemetry-bom"                % "1.18.0"
-val opentelemetrySdk              = "io.opentelemetry"               % "opentelemetry-sdk"                % "1.18.0"
-val opentelemetryInMemoryExporter = "io.opentelemetry"               % "opentelemetry-exporters-inmemory" % "0.9.1"
-val opentelemetryGCloudTraces     = "com.google.cloud.opentelemetry" % "exporter-trace"                   % "0.23.0"
-val opentelemetryGCloudMetrics    = "com.google.cloud.opentelemetry" % "exporter-metrics"                 % "0.23.0"
+val opentelemetryApi              = "io.opentelemetry"               % "opentelemetry-api"              % "1.18.0"
+val opentelemetryBom              = "io.opentelemetry"               % "opentelemetry-bom"              % "1.18.0"
+val opentelemetrySdk              = "io.opentelemetry"               % "opentelemetry-sdk"              % "1.18.0"
+val opentelemetryInMemoryExporter = "io.opentelemetry"               % "opentelemetry-exporter-logging" % "1.19.0"
+val opentelemetryGCloudTraces     = "com.google.cloud.opentelemetry" % "exporter-trace"                 % "0.23.0"
+val opentelemetryGCloudMetrics    = "com.google.cloud.opentelemetry" % "exporter-metrics"               % "0.23.0"
 
 val cats = "org.typelevel" %% "cats-core" % "2.7.0"
 

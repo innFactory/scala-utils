@@ -1,7 +1,7 @@
 package de.innfactory.play.smithy4play
 
 import cats.data.{ EitherT, Kleisli }
-import de.innfactory.play.tracing.TracerProvider
+import de.innfactory.play.tracing.OpentelemetryProvider
 import de.innfactory.play.tracing.TracingHelper.{ generateSpanFromRemoteSpan, traceWithParent }
 import de.innfactory.smithy4play.{ ContextRouteError, RouteResult, RoutingContext }
 import io.opentelemetry.api.trace.Span
@@ -45,7 +45,7 @@ abstract class AbstractBaseController[E, UC, RC <: ContextWithHeaders] {
 
       EndpointAction { r: RC =>
         val optionalSpan: Option[Span] = generateSpanFromRemoteSpan(r.httpHeaders)
-        val span                       = optionalSpan.getOrElse(TracerProvider.getTracer().spanBuilder(traceString).startSpan())
+        val span                       = optionalSpan.getOrElse(OpentelemetryProvider.getTracer().spanBuilder(traceString).startSpan())
         val traceActionResult          =
           traceWithParent(traceString, span, _ => result(r).value).map(r => finishSpan(span, r))
         EitherT(traceActionResult)

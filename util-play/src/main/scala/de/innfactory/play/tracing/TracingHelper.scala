@@ -17,7 +17,7 @@ object TracingHelper {
   def traceWithParent[T](traceString: String, parent: Span, processToTrace: Span => Future[T])(implicit
     ec: ExecutionContext
   ): Future[T] = {
-    val childSpan = TracerProvider
+    val childSpan = OpentelemetryProvider
       .getTracer()
       .spanBuilder(traceString)
       .setParent(Context.current.`with`(parent))
@@ -43,7 +43,7 @@ object TracingHelper {
       )
     extractedContext.makeCurrent()
     Some(
-      TracerProvider
+      OpentelemetryProvider
         .getTracer()
         .spanBuilder(headers.getHeader(XTRACINGID).getOrElse("generateSpanFromRemoteSpan"))
         .setParent(extractedContext)
