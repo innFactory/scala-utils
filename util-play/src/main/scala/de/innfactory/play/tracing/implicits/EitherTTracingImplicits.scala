@@ -1,30 +1,22 @@
 package de.innfactory.play.tracing.implicits
 
 import cats.data.EitherT
-import cats.implicits.catsSyntaxEitherId
-import de.innfactory.play.tracing.TraceRequest
-import io.opencensus.scala.Tracing.traceWithParent
-import io.opencensus.trace.Span
+import de.innfactory.play.controller.ResultStatus
+import de.innfactory.play.tracing.TraceContext
+import de.innfactory.play.tracing.TracingHelper.traceWithParent
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 object EitherTTracingImplicits {
 
-  implicit class EnhancedTracingEitherT[T, V](eitherT: EitherT[Future, V, T]) {
+  implicit class EnhancedTracingEitherT[T](eitherT: EitherT[Future, ResultStatus, T]) {
     def trace[A](
-                  string: String
-                )(implicit traceRequest: TraceRequest[A], ec: ExecutionContext): EitherT[Future, V, T] =
-      EitherT(traceWithParent(string, traceRequest.traceSpan) { span =>
-        eitherT.value
-      })
+      string: String
+    )(implicit rc: TraceContext, ec: ExecutionContext): EitherT[Future, ResultStatus, T] =
+      rc.span match {
+        case Some(value) =>
+          EitherT(traceWithParent(string, value, _ => eitherT.value))
+        case None        => eitherT
+      }
   }
-
-  def TracedT[A, V](
-                  string: String
-                )(implicit traceRequest: TraceRequest[A], ec: ExecutionContext): EitherT[Future, V, Span] =
-    EitherT(traceWithParent(string, traceRequest.traceSpan) { span =>
-      Future(span.asRight[V])
-    })
-
 }
-

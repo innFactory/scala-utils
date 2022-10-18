@@ -1,12 +1,13 @@
-package de.innfactory.play.smithy4play
+package de.innfactory.play.tracing
 
-import io.opencensus.trace.Span
+import de.innfactory.play.smithy4play.{ ContextWithHeaders, HttpHeaders, ImplicitLogContext }
+import io.opentelemetry.api.trace.Span
 
 trait TraceContext extends ImplicitLogContext with ContextWithHeaders {
   def httpHeaders: HttpHeaders
   def span: Option[Span]
 
-  private val traceLogger = new TraceLogger(span)
+  private val traceLogger    = new TraceLogger(span)
   final def log: TraceLogger = traceLogger
 
   def logIfDebug(message: String, entity: Option[String] = None): Unit =

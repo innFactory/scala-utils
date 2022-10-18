@@ -1,10 +1,10 @@
 package de.innfactory.play.smithy4play
 
 import cats.data.{ EitherT, Kleisli }
-import de.innfactory.play.smithy4play.TracingHelper.generateSpanFromRemoteSpan
+import de.innfactory.play.tracing.OpentelemetryProvider
+import de.innfactory.play.tracing.TracingHelper.{ generateSpanFromRemoteSpan, traceWithParent }
 import de.innfactory.smithy4play.{ ContextRouteError, RouteResult, RoutingContext }
-import io.opencensus.scala.Tracing.{ startSpan, traceWithParent }
-import io.opencensus.trace.Span
+import io.opentelemetry.api.trace.Span
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -30,25 +30,24 @@ abstract class AbstractBaseController[E, UC, RC <: ContextWithHeaders] {
       EitherT.rightT[Future, E](createRequestContextFromRoutingContext(r))
     }
 
-  case class TracingAction(traceString: String)(implicit ec: ExecutionContext) {
+  case class TracingAction(traceString: String)(implicit
+    ec: ExecutionContext,
+    logContext: LogContext
+  ) {
     def andThen[O](
       result: Kleisli[ApplicationRouteResult, RC, O]
     ): Kleisli[ApplicationRouteResult, RC, O] = {
 
-      def finishSpan[A](parentSpan: Span, childSpan: Span, result: O): O = {
-        childSpan.end()
+      def finishSpan[A](parentSpan: Span, result: Either[E, O]): Either[E, O] = {
         parentSpan.end()
         result
       }
 
       EndpointAction { r: RC =>
-        val optionalSpan: Option[_root_.io.opencensus.trace.Span] = generateSpanFromRemoteSpan(r.httpHeaders)
-        val span                                                  = optionalSpan.getOrElse(startSpan(traceString))
-        val traceActionResult                                     = traceWithParent(traceString, span) { spanChild =>
-          result(r).map { r =>
-            finishSpan(span, spanChild, r)
-          }.value
-        }
+        val optionalSpan: Option[Span] = generateSpanFromRemoteSpan(r.httpHeaders)
+        val span                       = optionalSpan.getOrElse(OpentelemetryProvider.getTracer().spanBuilder(traceString).startSpan())
+        val traceActionResult          =
+          traceWithParent(traceString, span, _ => result(r).value).map(r => finishSpan(span, r))
         EitherT(traceActionResult)
       }
 
@@ -59,12 +58,18 @@ abstract class AbstractBaseController[E, UC, RC <: ContextWithHeaders] {
 
   object Endpoint {
 
-    def withAuth(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[UC] =
+    def withAuth(implicit
+      ec: ExecutionContext,
+      logContext: LogContext
+    ): EndpointAction[UC] =
       addAdditionalAction(AuthAction)
 
     def withAction[O](
       additionalAction: Kleisli[ApplicationRouteResult, RC, O]
-    )(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[O] = addAdditionalAction(additionalAction)
+    )(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[O] =
+      addAdditionalAction(
+        additionalAction
+      )
 
     def execute[O](
       f: RC => ApplicationRouteResult[O]
