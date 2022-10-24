@@ -35,6 +35,29 @@ object OpentelemetryProvider {
       throw new InstantiationException("Meter not configured! Call TracerProvider.configure on application startup")
     )
 
+  def configureMock()(implicit lifeCycle: ApplicationLifecycle, ec: ExecutionContext): Unit = {
+    if (tracer.isDefined && meter.isDefined) return
+    val sdkTracerProvider = SdkTracerProvider.builder().build()
+    val sdkMeterProvider  = SdkMeterProvider.builder().build()
+
+    val openTelemetry: OpenTelemetry = OpenTelemetrySdk.builder
+      .setTracerProvider(sdkTracerProvider)
+      .setMeterProvider(sdkMeterProvider)
+      .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance))
+      .buildAndRegisterGlobal
+
+    tracer = Some(
+      openTelemetry.getTracer(
+        "mock"
+      )
+    )
+    meter = Some(
+      openTelemetry.getMeter(
+        "mock"
+      )
+    )
+  }
+
   def configure(
     instrumenationScopeName: String,
     projectId: String,
