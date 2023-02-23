@@ -2,12 +2,15 @@ package de.innfactory.play.tracing
 
 import de.innfactory.play.smithy4play.HttpHeaders
 import de.innfactory.play.tracing.GoogleTracingIdentifier.XTRACINGID
+import io.opencensus.trace.SpanBuilder
 import io.opentelemetry.api.GlobalOpenTelemetry
-import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.common.{ AttributeKey, Attributes }
+import io.opentelemetry.api.trace.{ Span, SpanContext, StatusCode }
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.TextMapGetter
 
 import java.lang
+import java.util.concurrent.TimeUnit
 import scala.collection.mutable
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.jdk.CollectionConverters.IterableHasAsJava
@@ -41,15 +44,7 @@ object TracingHelper {
           override def get(carrier: mutable.Map[String, String], key: String): String    = carrier.get(key).orNull
         }
       )
-    val scope            = extractedContext.makeCurrent()
-    val span             = OpentelemetryProvider
-      .getTracer()
-      .spanBuilder(
-        headers.getHeader(XTRACINGID).getOrElse("generateSpanFromRemoteSpan")
-      )
-      .setParent(extractedContext)
-      .startSpan()
-    scope.close()
-    Some(span)
+    val span = Span.fromContextOrNull(extractedContext)
+    Option(span)
   }
 }
