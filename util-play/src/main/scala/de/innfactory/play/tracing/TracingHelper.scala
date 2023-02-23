@@ -41,13 +41,15 @@ object TracingHelper {
           override def get(carrier: mutable.Map[String, String], key: String): String    = carrier.get(key).orNull
         }
       )
-    extractedContext.makeCurrent()
-    Some(
-      OpentelemetryProvider
-        .getTracer()
-        .spanBuilder(headers.getHeader(XTRACINGID).getOrElse("generateSpanFromRemoteSpan"))
-        .setParent(extractedContext)
-        .startSpan()
-    )
+    val scope            = extractedContext.makeCurrent()
+    val span             = OpentelemetryProvider
+      .getTracer()
+      .spanBuilder(
+        headers.getHeader(XTRACINGID).getOrElse("generateSpanFromRemoteSpan")
+      )
+      .setParent(extractedContext)
+      .startSpan()
+    scope.close()
+    Some(span)
   }
 }
