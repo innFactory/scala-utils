@@ -12,6 +12,8 @@ abstract class AbstractBaseController[E, UC, RC <: ContextWithHeaders] {
 
   protected type ApplicationRouteResult[O] = EitherT[Future, E, O]
 
+  def contextWithSpan(rc: RC, span: Span): RC
+
   def errorHandler(e: E): ContextRouteError
 
   def createRequestContextFromRoutingContext(r: RoutingContext): RC
@@ -47,7 +49,7 @@ abstract class AbstractBaseController[E, UC, RC <: ContextWithHeaders] {
         val optionalSpan: Option[Span] = generateSpanFromRemoteSpan(r.httpHeaders)
         val span                       = optionalSpan.getOrElse(OpentelemetryProvider.getTracer().spanBuilder(traceString).startSpan())
         val traceActionResult          =
-          traceWithParent(traceString, span, _ => result(r).value).map(r => finishSpan(span, r))
+          traceWithParent(traceString, span, _ => result(contextWithSpan(r, span)).value).map(r => finishSpan(span, r))
         EitherT(traceActionResult)
       }
 
