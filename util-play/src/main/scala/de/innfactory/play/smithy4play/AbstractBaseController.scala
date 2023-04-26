@@ -78,6 +78,18 @@ abstract class AbstractBaseController[E, UC, RC <: ContextWithHeaders] {
     )(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[O] =
       addAdditionalAction(Kleisli.apply(f))
 
+    def executeWithoutTrace[O](
+      f: RC => ApplicationRouteResult[O]
+    )(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[O] =
+      addAdditionalActionWithoutTrace(Kleisli.apply(f))
+
+    private def addAdditionalActionWithoutTrace[O](
+      additionalAction: Kleisli[ApplicationRouteResult, RC, O]
+    )(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[O] = {
+      val chained = TransformRoutingContextToApplicationRoutingContext andThen additionalAction
+      new EndpointAction[O](chained)
+    }
+
     private def addAdditionalAction[O](
       additionalAction: Kleisli[ApplicationRouteResult, RC, O]
     )(implicit ec: ExecutionContext, logContext: LogContext): EndpointAction[O] = {
