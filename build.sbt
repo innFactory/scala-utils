@@ -2,7 +2,7 @@ import sbt._
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "2.0.5"
+val releaseVersion = "2.0.6"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -90,7 +90,7 @@ val sharedDeps  = "com.google.cloud" % "google-cloud-shared-dependencies" % "2.5
 val logback     = "ch.qos.logback"   % "logback-classic"                  % "1.2.10"
 val logbackCore = "ch.qos.logback"   % "logback-core"                     % "1.2.10"
 
-val smithy4play = "de.innfactory" %% "smithy4play" % "0.2.3-HOTFIX"
+val smithy4play = "de.innfactory" %% "smithy4play" % "0.4.2"
 
 val guice = "com.google.inject" % "guice" % "4.2.3"
 
