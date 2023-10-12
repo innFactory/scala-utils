@@ -2,7 +2,7 @@ import sbt._
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "2.0.8"
+val releaseVersion = "2.0.9"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -76,8 +76,6 @@ val opentelemetryApi              = "io.opentelemetry"               % "opentele
 val opentelemetryBom              = "io.opentelemetry"               % "opentelemetry-bom"              % "1.18.0"
 val opentelemetrySdk              = "io.opentelemetry"               % "opentelemetry-sdk"              % "1.18.0"
 val opentelemetryInMemoryExporter = "io.opentelemetry"               % "opentelemetry-exporter-logging" % "1.19.0"
-val opentelemetryGCloudTraces     = "com.google.cloud.opentelemetry" % "exporter-trace"                 % "0.23.0"
-val opentelemetryGCloudMetrics    = "com.google.cloud.opentelemetry" % "exporter-metrics"               % "0.23.0"
 
 val cats = "org.typelevel" %% "cats-core" % "2.7.0"
 
@@ -126,8 +124,6 @@ lazy val play = (project in file("util-play"))
       opentelemetryApi,
       opentelemetryBom,
       opentelemetrySdk,
-      opentelemetryGCloudTraces,
-      opentelemetryGCloudMetrics,
       opentelemetryInMemoryExporter
     )
   )
