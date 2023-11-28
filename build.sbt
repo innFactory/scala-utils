@@ -2,7 +2,7 @@ import sbt._
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "2.0.9"
+val releaseVersion = "2.0.10"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -67,15 +67,15 @@ val slickJodaMapper    = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2
 val flyWayCore         = "org.flywaydb"          % "flyway-core"        % "8.4.1"
 val joda               = "joda-time"             % "joda-time"          % "2.10.13"
 
-val playVersion  = "2.8.13"
+val playVersion  = "2.9.0-RC2"
 val typesafePlay = "com.typesafe.play" %% "play"      % playVersion
 val playWs       = "com.typesafe.play" %% "play-ws"   % playVersion
 val playJson     = "com.typesafe.play" %% "play-json" % "2.9.2"
 
-val opentelemetryApi              = "io.opentelemetry"               % "opentelemetry-api"              % "1.18.0"
-val opentelemetryBom              = "io.opentelemetry"               % "opentelemetry-bom"              % "1.18.0"
-val opentelemetrySdk              = "io.opentelemetry"               % "opentelemetry-sdk"              % "1.18.0"
-val opentelemetryInMemoryExporter = "io.opentelemetry"               % "opentelemetry-exporter-logging" % "1.19.0"
+val opentelemetryApi              = "io.opentelemetry" % "opentelemetry-api"              % "1.18.0"
+val opentelemetryBom              = "io.opentelemetry" % "opentelemetry-bom"              % "1.18.0"
+val opentelemetrySdk              = "io.opentelemetry" % "opentelemetry-sdk"              % "1.18.0"
+val opentelemetryInMemoryExporter = "io.opentelemetry" % "opentelemetry-exporter-logging" % "1.19.0"
 
 val cats = "org.typelevel" %% "cats-core" % "2.7.0"
 
