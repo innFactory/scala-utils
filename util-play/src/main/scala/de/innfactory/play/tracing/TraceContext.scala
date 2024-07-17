@@ -7,7 +7,7 @@ trait TraceContext extends ImplicitLogContext with ContextWithHeaders {
   def httpHeaders: HttpHeaders
   def span: Option[Span]
 
-  private val traceLogger    = new TraceLogger(span)
+  protected val traceLogger    = new TraceLogger(span)
   final def log: TraceLogger = traceLogger
 
   def logIfDebug(message: String, entity: Option[String] = None): Unit =

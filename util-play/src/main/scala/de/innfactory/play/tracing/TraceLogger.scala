@@ -9,10 +9,10 @@ import play.api.libs.json.Json
 class TraceLogger(span: Option[Span]) {
   private val logger: org.slf4j.Logger = Logger.apply("request-context").logger
 
-  private def getMarker(span: Span, entity: Option[String])(implicit logContext: LogContext): Marker =
+  protected def getMarker(span: Span, entity: Option[String])(implicit logContext: LogContext): Marker =
     MarkerFactory.getMarker(spanToMarker(span, entity))
 
-  private def spanToMarker(span: Span, entity: Option[String])(implicit logContext: LogContext): String =
+  protected def spanToMarker(span: Span, entity: Option[String])(implicit logContext: LogContext): String =
     Json.prettyPrint(Json.toJson(logContext.toLogbackContext(span.getSpanContext.getTraceId, entity)))
 
   def warn(message: String, entity: Option[String] = None)(implicit logContext: LogContext): Unit =
