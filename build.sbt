@@ -2,7 +2,7 @@ import sbt._
 //settings
 
 name := """scala-utils"""
-val releaseVersion = "2.0.11"
+val releaseVersion = "2.0.12"
 
 val token = sys.env.getOrElse("GITHUB_TOKEN", "")
 
@@ -44,7 +44,6 @@ lazy val utilGraphQL = (project in file("util-graphql"))
     libraryDependencies ++= Seq(
       typesafePlay,
       playJson,
-      joda,
       sangria,
       sangriaMarshallingApi,
       sangriaSlowlog
@@ -56,16 +55,14 @@ lazy val utilImplicits = (project in file("util-implicits")).settings(
 ) settings (
   name := "util-implicits"
 )
-val slickPgJts         = "com.github.tminglei"  %% "slick-pg_jts"       % "0.19.3"
-val slick              = "com.typesafe.slick"   %% "slick"              % "3.3.3"
-val slickCodegen       = "com.typesafe.slick"   %% "slick-codegen"      % "3.3.3"
-val slickHikaricp      = "com.typesafe.slick"   %% "slick-hikaricp"     % "3.3.3"
-val hikariCP           = "com.zaxxer"            % "HikariCP"           % "5.0.1"
-val slickPg            = "com.github.tminglei"  %% "slick-pg"           % "0.20.2"
-val slickPgPlayJson    = "com.github.tminglei"  %% "slick-pg_play-json" % "0.20.2"
-val slickJodaMapper    = "com.github.tototoshi" %% "slick-joda-mapper"  % "2.4.2"
-val flyWayCore         = "org.flywaydb"          % "flyway-core"        % "8.4.1"
-val joda               = "joda-time"             % "joda-time"          % "2.10.13"
+val slickPgJts         = "com.github.tminglei" %% "slick-pg_jts"       % "0.22.2"
+val slick              = "com.typesafe.slick"  %% "slick"              % "3.5.1"
+val slickCodegen       = "com.typesafe.slick"  %% "slick-codegen"      % "3.5.1"
+val slickHikaricp      = "com.typesafe.slick"  %% "slick-hikaricp"     % "3.5.1"
+val hikariCP           = "com.zaxxer"           % "HikariCP"           % "5.1.0"
+val slickPg            = "com.github.tminglei" %% "slick-pg"           % "0.22.2"
+val slickPgPlayJson    = "com.github.tminglei" %% "slick-pg_play-json" % "0.22.2"
+val flyWayCore         = "org.flywaydb"         % "flyway-core"        % "8.4.1"
 
 val playVersion  = "2.9.0-RC2"
 val typesafePlay = "com.typesafe.play" %% "play"      % playVersion
@@ -111,7 +108,6 @@ lazy val play = (project in file("util-play"))
       typesafePlay,
       slickPg,
       slickPgPlayJson,
-      slickJodaMapper,
       slick,
       slickCodegen,
       slickHikaricp,

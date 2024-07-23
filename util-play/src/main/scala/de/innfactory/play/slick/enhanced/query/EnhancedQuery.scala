@@ -1,7 +1,17 @@
 package de.innfactory.play.slick.enhanced.query
 
 import de.innfactory.play.db.codegen.XPostgresProfile
-import de.innfactory.play.slick.enhanced.utils.filteroptions.{BooleanFilterOptions, DoubleFilterOptions, FilterOptions, IntFilterOptions, LongFilterOptions, LongSeqFilterOptions, OptionStringFilterOptions, SeqFilterOptions, StringFilterOptions}
+import de.innfactory.play.slick.enhanced.utils.filteroptions.{
+  BooleanFilterOptions,
+  DoubleFilterOptions,
+  FilterOptions,
+  IntFilterOptions,
+  LongFilterOptions,
+  LongSeqFilterOptions,
+  OptionStringFilterOptions,
+  SeqFilterOptions,
+  StringFilterOptions
+}
 import play.api.Logger
 import slick.lifted.StringColumnExtensionMethods
 
@@ -51,11 +61,11 @@ object EnhancedQuery {
           applyFilterOptions(processedQuery.filterOptDoubleOptions(option), seq.tail)
         case option: SeqFilterOptions[I]          => applyFilterOptions(processedQuery.filterOptSeqString(option), seq.tail)
         case option: LongSeqFilterOptions[I]      => applyFilterOptions(processedQuery.filterOptSeqLong(option), seq.tail)
-        case option: BooleanFilterOptions[I]      => applyFilterOptions(processedQuery.filterOptBooleanOptions(option), seq.tail)
-        case o                                    => {
+        case option: BooleanFilterOptions[I]      =>
+          applyFilterOptions(processedQuery.filterOptBooleanOptions(option), seq.tail)
+        case o                                    =>
           Logger.apply("EnhancedQuery").logger.error("process filterOptions | unknown Option: " + o)
           applyFilterOptions(query, seq.tail)
-        }
       }
 
     def filterOptStringOptions[T <: StringFilterOptions[I]](
@@ -97,8 +107,8 @@ object EnhancedQuery {
     /* Boolean OPTIONS */
 
     def filterOptBooleanOptions[T <: BooleanFilterOptions[I]](
-                                                      booleanFilterOption: BooleanFilterOptions[I]
-                                                    ): Query[I, F, Seq] = {
+      booleanFilterOption: BooleanFilterOptions[I]
+    ): Query[I, F, Seq] = {
       implicit val selector: I => Rep[Boolean] = booleanFilterOption.selector
       query.filterOptBoolean(booleanFilterOption.equalsOption.value)
     }
@@ -196,8 +206,8 @@ object EnhancedQuery {
     /* REP[BOOLEAN] OPTIONS */
 
     def filterOptBoolean(
-                        option: Option[Boolean]
-                      )(implicit selector: I => Rep[Boolean]): Query[I, F, Seq] =
+      option: Option[Boolean]
+    )(implicit selector: I => Rep[Boolean]): Query[I, F, Seq] =
       query.filterOpt(option)((r, v) => selector(r) === v)
 
     /* REP[STRING] OPTIONS */
