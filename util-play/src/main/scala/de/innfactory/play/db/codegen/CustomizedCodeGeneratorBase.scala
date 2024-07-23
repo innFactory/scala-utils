@@ -5,12 +5,15 @@ import slick.codegen.SourceCodeGenerator
 import slick.sql.SqlProfile.ColumnOption
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 /**
  *  This customizes the Slick code generator.
  */
-abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCodeGeneratorConfig: CustomizedCodeGeneratorConfig, config: Config[T]) {
+abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](
+  customizedCodeGeneratorConfig: CustomizedCodeGeneratorConfig,
+  config: Config[T]
+) {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   /**
@@ -26,7 +29,7 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
    * @param typeName
    * @return
    */
-  def rawTypeMatcherBase(typeName: String): Option[String] = {
+  def rawTypeMatcherBase(typeName: String): Option[String] =
     typeName match {
       case "hstore"                                      => Option("Map[String, String]")
       case "_text" | "text[]" | "_varchar" | "varchar[]" => Option("List[String]")
@@ -35,7 +38,6 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
       case "_int2" | "int2[]"                            => Option("List[Short]")
       case s: String                                     => rawTypeMatcherExtension(s)
     }
-  }
 
   /**
    * RawTypeMatcher for non standard types like geometry
@@ -43,46 +45,40 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
    * @param typeName
    * @return
    */
-  def rawTypeMatcherExtension(typeName: String): Option[String] = {
+  def rawTypeMatcherExtension(typeName: String): Option[String] =
     typeName match {
-      case "geometry"                                    => Option("com.vividsolutions.jts.geom.Geometry")
-      case _ => None
+      case "geometry" => Option("com.vividsolutions.jts.geom.Geometry")
+      case _          => None
     }
-  }
 
   /**
    * sql raw type mapper to override standard sql types to custom types
    * @param typeName
    * @return
    */
-  def sqlTypeMapper(typeName: String, superRawType: String): String = {
+  def sqlTypeMapper(typeName: String, superRawType: String): String =
     typeName match {
-      case "java.sql.Date"      => "org.joda.time.LocalDate"
-      case "java.sql.Time"      => "org.joda.time.LocalTime"
-      case "java.sql.Timestamp" => "org.joda.time.DateTime"
+      case "java.sql.Timestamp" => "java.time.LocalDateTime"
+      case "java.sql.Date"      => "java.time.LocalDate"
       case _                    => superRawType
     }
-  }
 
-  val codeGenImports: String = {
+  val codeGenImports: String =
     s"""
-       import com.github.tototoshi.slick.PostgresJodaSupport._
-       import org.joda.time.DateTime
        import com.vividsolutions.jts.geom.Point
        """
-  }
 
   val projectDir: String = System.getProperty("user.dir")
 
   def main(args: Array[String]): Unit =
-  // write the generated results to file
+    // write the generated results to file
     Await.result(
       codegen.map(
         _.writeToFile(
           profile = customizedCodeGeneratorConfig.profile, // Using customized Codegen profile from config
-          folder= s"$projectDir${customizedCodeGeneratorConfig.folder}" ,
+          folder = s"$projectDir${customizedCodeGeneratorConfig.folder}",
           pkg = customizedCodeGeneratorConfig.pkg,
-          container= customizedCodeGeneratorConfig.container,
+          container = customizedCodeGeneratorConfig.container,
           fileName = customizedCodeGeneratorConfig.fileName
         )
       ),
@@ -94,7 +90,8 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
   val db = slickProfile.api.Database.forURL(config.url, driver = config.jdbcDriver)
 
   lazy val codegen: Future[SourceCodeGenerator] = db.run {
-    config.slickProfile.defaultTables.map(_.filter(t => included contains t.name.name.toUpperCase))
+    config.slickProfile.defaultTables
+      .map(_.filter(t => included contains t.name.name.toUpperCase))
       .flatMap(
         config.slickProfile
           .createModelBuilder(_, ignoreInvalidDefaults = false)
@@ -110,7 +107,7 @@ abstract class CustomizedCodeGeneratorBase[T <: ExPostgresProfile](customizedCod
               override def rawType: String =
                 model.options
                   .find(_.isInstanceOf[ColumnOption.SqlType])
-                  .flatMap( tpe => rawTypeMatcherBase(tpe.asInstanceOf[ColumnOption.SqlType].typeName))
+                  .flatMap(tpe => rawTypeMatcherBase(tpe.asInstanceOf[ColumnOption.SqlType].typeName))
                   .getOrElse(sqlTypeMapper(model.tpe, super.rawType))
             }
         }

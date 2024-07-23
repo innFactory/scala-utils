@@ -5,7 +5,7 @@ import play.api.libs.json.{JsValue, Json}
 import slick.basic.Capability
 
 trait XPostgresProfile
-  extends ExPostgresProfile
+    extends ExPostgresProfile
     with PgArraySupport
     with PgDate2Support
     with PgRangeSupport
@@ -26,9 +26,9 @@ trait XPostgresProfile
   override val api = CodegenAPI
 
   object CodegenAPI
-    extends API
+      extends ExtPostgresAPI
       with ArrayImplicits
-      with DateTimeImplicits
+      with Date2DateTimeImplicitsDuration
       with JsonImplicits
       with NetImplicits
       with LTreeImplicits
@@ -38,7 +38,7 @@ trait XPostgresProfile
       with PlayJsonImplicits
       with SearchImplicits
       with SearchAssistants {
-    implicit val strListTypeMapper: DriverJdbcType[List[String]] =
+    implicit val strListTypeMapper: DriverJdbcType[List[String]]        =
       new SimpleArrayJdbcType[String]("text").to(_.toList)
     implicit val playJsonArrayTypeMapper: DriverJdbcType[List[JsValue]] =
       new AdvancedArrayJdbcType[JsValue](
@@ -50,4 +50,3 @@ trait XPostgresProfile
 }
 
 object XPostgresProfile extends XPostgresProfile
-
